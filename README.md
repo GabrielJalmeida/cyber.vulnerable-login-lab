@@ -1,37 +1,40 @@
-# Vulnerable Login Lab — Flask + Kali Linux + Medusa
+# Vulnerable Login Lab — Flask, Kali Linux & Medusa
 
-> **Educational lab only.** This application is intentionally vulnerable and is designed to run on a local, isolated VirtualBox Host-Only network. Do not deploy it to the public internet, expose it to an untrusted network, or reuse its authentication design in a real application.
+> **Educational lab only.** This project intentionally contains a weak login flow for a controlled cybersecurity exercise. Run it only on a local machine or an isolated VirtualBox Host-Only/Internal network that you control. Do not expose it to the public internet or use it against systems without explicit authorization.
 
-A small Flask login form created for a cybersecurity class exercise. The goal was to understand how an HTML form sends credentials using HTTP `POST`, inspect the request and response in browser DevTools, connect a Kali Linux virtual machine to a Flask service on a Windows host, and observe how Medusa's `web-form` module distinguishes a failed login from a successful one.
+A small Flask login application built to study the full path from an HTML form to an HTTP request, backend authentication logic, virtual networking, and controlled testing with Medusa's `web-form` module. The exercise also documents the troubleshooting process, including mistakes and how they were diagnosed.
 
-## What this project demonstrates
+## Learning objectives
 
-- Browser DevTools: inspecting `POST /login`, form fields, status codes and response content.
-- Backend: a Flask route that receives `username` and `password` form fields.
-- Networking: accessing a Windows-hosted service from Kali through a VirtualBox Host-Only adapter.
-- Controlled security testing: two small text files used as input for a single, local training exercise with Medusa.
-- Troubleshooting: shell quoting, one-value-per-line wordlists, `localhost` vs. a host-only IP, and HTTP response behavior.
+- Inspect a form submission using browser DevTools (Network/Rede, request payload, HTTP status and response body).
+- Understand how `POST /login` sends the `username` and `password` fields to a Flask route.
+- Connect a Kali Linux VM to a service running on a Windows host through VirtualBox Host-Only networking.
+- Use a small, disposable username list and password list to test the lab form with Medusa.
+- Interpret application logs, distinguish HTTP status codes from response markers, and document failures as well as successful results.
+- Identify basic controls that a real authentication endpoint should implement.
 
-## Lab topology used in the exercise
+## Lab topology
 
-| Component | Example value | Purpose |
+The original exercise used the following private Host-Only addresses. Your addresses may differ; use the values assigned to your own VirtualBox adapters.
+
+| Component | Address / value | Role |
 |---|---|---|
-| Windows host-only IP | `192.168.219.1` | Hosts the Flask app |
-| Kali VM host-only IP | `192.168.219.10` | Sends the lab requests |
-| Flask port | `5000` | Login form service |
-| Endpoint | `POST /login` | Accepts the form data |
+| Windows Host-Only adapter | `192.168.219.1` | Runs the Flask application |
+| Kali VM Host-Only adapter | `192.168.219.10` | Sends requests from the lab VM |
+| Flask port | `5000` | Web service |
+| Endpoint | `POST /login` | Accepts the login form |
 
-Your VirtualBox network and adapter addresses may differ. Substitute your own **Host-Only** addresses. Do not aim the exercise at an internet host or a system you do not own or have explicit permission to test.
+The target is **the Flask web form only**. The exercise did not compromise the Windows account, the Kali VM, or an operating-system login.
 
 ## Requirements
 
-- Python 3.10+ (the original exercise ran on Windows with Python 3.14.6)
-- Flask and pytest, installed from `requirements.txt`
-- Oracle VirtualBox with Kali Linux
-- Medusa compiled/installed in Kali with the `web-form` module available
-- A Host-Only network configured between the host and VM
+- Python and `pip`
+- Flask and pytest (installed from `requirements.txt`)
+- Oracle VirtualBox and Kali Linux
+- Medusa with the `web-form` module available in Kali
+- A Host-Only or Internal Network configured for the lab
 
-## 1. Install and run the Flask application on Windows
+## 1. Install dependencies on Windows
 
 Open Command Prompt in the project directory:
 
@@ -41,134 +44,152 @@ venv\Scripts\activate
 python -m pip install -r requirements.txt
 ```
 
-Set the fake lab credentials in the current CMD session. These values are for this local exercise only:
+## 2. Start the Flask application
+
+The demo credentials are intentionally fixed in `app.py`:
+
+- Username: `aluno`
+- Password: `Lab123!`
+
+They are disposable lab credentials, not values to reuse on any real account. The application does not read `LAB_USERNAME` or `LAB_PASSWORD` environment variables.
+
+Find the IPv4 address of the Windows Host-Only adapter with `ipconfig`. Then start the app bound to that specific address. The command below uses the address from the original exercise; replace it if your adapter uses a different IP:
 
 ```bat
-set LAB_USERNAME=aluno
-set LAB_PASSWORD=Lab123!
+python app.py --host 192.168.219.1 --port 5000
 ```
 
-For a host-only VM connection, start Flask bound specifically to the Windows Host-Only adapter's IPv4 address. The address below is the one used in the original exercise; check `ipconfig` on your own machine first.
+The app defaults to `127.0.0.1` if no host is specified and refuses `0.0.0.0` when started through `python app.py`. Keep the Flask server running during the exercise. Stop it with `Ctrl+C` when finished.
 
-```bat
-flask --app app run --host=192.168.219.1 --port=5000
-```
+Do not bind this intentionally vulnerable app to a public or bridged interface. Keep the VM network isolated and do not expose port `5000` to untrusted networks.
 
-Keep this terminal open. For a quick first test, open `http://127.0.0.1:5000/` on Windows. To use the VM, browse to `http://192.168.219.1:5000/` from Kali, substituting your adapter address if different.
+## 3. Inspect the HTTP request in a browser
 
-**Network safety:** do not use `--host=0.0.0.0` as a shortcut. Bind to the specific Host-Only adapter address. Keep the Host-Only subnet separate from public/bridged networks and stop the server when the exercise is finished.
-
-## 2. Confirm the HTTP form behavior
-
-Open the login page in a browser and press `F12` → **Network / Rede**. Submit a test login and inspect the `/login` request.
+Open the login page in a browser and press `F12`. Select **Network / Rede**, submit a login attempt, and inspect the `/login` request.
 
 Expected request details:
 
 - Method: `POST`
-- URL: `/login`
+- Path: `/login`
 - Form fields: `username` and `password`
-- Content type: typically `application/x-www-form-urlencoded`
-- Failed response marker: `LOGIN_FAILED - Invalid username or password.`
-- Successful response marker: `LOGIN_OK - Access granted.`
+- Content type: usually `application/x-www-form-urlencoded`
+- Failed-login response marker: `LOGIN_FAILED - Invalid username or password.`
+- Successful-login response marker: `LOGIN_OK - Access granted.`
 
-The lab deliberately returns HTTP `200 OK` for both outcomes, so the experiment uses the response marker rather than the HTTP status alone. This was a debugging choice for the training exercise, **not** a production recommendation. Real applications should use appropriate status codes and implement robust authentication controls.
+For compatibility with the particular Medusa module used in the exercise, this lab returns HTTP `200 OK` for both valid and invalid credentials and distinguishes the result by a marker in the response body. This is a deliberate test-lab choice, **not a production recommendation**. Real applications should have a clear HTTP contract and appropriate authentication protections.
 
-You can check the route with a single manual request from Kali:
+You can make a single manual request from Kali to verify the endpoint. Use only the demo values configured in this project:
 
 ```bash
 curl -i -X POST --data-urlencode 'username=aluno' --data-urlencode 'password=Lab123!' http://192.168.219.1:5000/login
 ```
 
-Use only the demo credentials configured for your own local instance. Do not paste real credentials into documentation, terminals that are recorded, or public issue trackers.
+## 4. Review the sample wordlists
 
-## 3. Prepare two wordlist files in Kali
+The repository contains disposable demonstration lists:
 
-Create one username per line:
+- [`wordlists/usernames.txt`](wordlists/usernames.txt): 4 usernames, one per line
+- [`wordlists/passwords.txt`](wordlists/passwords.txt): 6 passwords, one per line
 
-```bash
-printf '%s\n' admin gabriel aluno teste > users.txt
-```
+That is up to **4 × 6 = 24 candidate pairs**. These lists are intentionally small and are only for this lab. The working lists created at the repository root (`users.txt` and `passwords.txt`) are local exercise files and should not be committed.
 
-Create one password per line:
-
-```bash
-printf '%s\n' '123456' 'senha123' 'senha-incorreta-lab' 'Lab123!' > passwords.txt
-```
-
-Verify the shape of the files:
+To use the repository's sample lists directly from Kali, clone the repository inside the VM and enter its directory:
 
 ```bash
-cat -n users.txt
-cat -n passwords.txt
+git clone https://github.com/GabrielJalmeida/cyber.vulnerable-login-lab.git
+cd cyber.vulnerable-login-lab
 ```
 
-Each command should display **four numbered lines**, not one line containing backslashes. The two files contain four values each, which creates 4 × 4 = **16 possible username/password pairs**. These files are local test input and are excluded from Git by `.gitignore`; the repository contains example versions under `examples/` instead.
-
-## 4. Run Medusa against the isolated lab form
-
-First, `medusa -M web-form -q` displays the module's supported options. In the original exercise, the relevant options were `FORM`, `FORM-DATA`, and `DENY-SIGNAL`.
-
-With the Flask service running on the Host-Only adapter, run:
+Inspect the sample files with:
 
 ```bash
-medusa -h 192.168.219.1 -n 5000 -U users.txt -P passwords.txt -M web-form -m FORM:login -m 'FORM-DATA:POST?username=&password=' -m 'DENY-SIGNAL:LOGIN_FAILED' -t 1
+cat -n wordlists/usernames.txt
+cat -n wordlists/passwords.txt
 ```
 
-The command is intentionally scoped to the example private Host-Only address and the form in this repository. Do not replace the target with a public website, campus service, or another person's system.
+The historical exercise used two local files containing four entries each. The public sample files were later adjusted to four usernames and six passwords, so reproducing the run with the current repository lists tests up to 24 combinations rather than 16.
 
-### What the options mean
+## 5. Run the controlled Medusa exercise
 
-| Option | Meaning |
+First inspect the installed module's supported options:
+
+```bash
+medusa -M web-form -q
+```
+
+With the Flask service running on the Windows Host-Only address, run the test **only against this lab target**:
+
+```bash
+medusa -h 192.168.219.1 -n 5000 -U wordlists/usernames.txt -P wordlists/passwords.txt -M web-form -m FORM:login -m 'FORM-DATA:POST?username=&password=' -m 'DENY-SIGNAL:LOGIN_FAILED' -t 1
+```
+
+Replace `192.168.219.1` if your own Host-Only adapter has a different address. Do not replace the target with a public website, campus service, or another person's system.
+
+| Option | Purpose |
 |---|---|
-| `-h 192.168.219.1` | Host-only IP where Flask is listening |
+| `-h` | Address of the lab server |
 | `-n 5000` | TCP port of the Flask service |
-| `-U users.txt` | File of usernames, one per line |
-| `-P passwords.txt` | File of passwords, one per line |
-| `-M web-form` | Select the module for web form authentication |
-| `FORM:login` | Form endpoint path `/login` |
-| `FORM-DATA:POST?username=&password=` | Submit a POST form with the two named fields |
-| `DENY-SIGNAL:LOGIN_FAILED` | Marker text that identifies a failed login response |
-| `-t 1` | Keep the lab run sequential and low-concurrency |
+| `-U` | Username file, one entry per line |
+| `-P` | Password file, one entry per line |
+| `-M web-form` | Selects Medusa's web-form module |
+| `FORM:login` | Targets the `/login` path |
+| `FORM-DATA:POST?username=&password=` | Sends a POST with the expected form fields |
+| `DENY-SIGNAL:LOGIN_FAILED` | Text used by this test to identify an unsuccessful login |
+| `-t 1` | Keeps the test sequential with low concurrency |
 
-## 5. Successful result observed
+### Result observed during the exercise
 
-The final successful run produced a line equivalent to:
+The successful run reported a result equivalent to:
 
 ```text
 ACCOUNT FOUND: [web-form] Host: 192.168.219.1 User: aluno Password: Lab123! [SUCCESS]
 ```
 
-This confirmed that the form accepted the demo pair configured for the lab. It did **not** compromise Windows, the Kali VM, or an operating-system account: the target was the deliberately vulnerable Flask web form running on the Windows host.
+The Windows Flask log also showed a `POST /login` request from the Kali Host-Only address. Together, these observations confirmed that the VM reached the local service and Medusa recognized the demo credential configured in the form.
 
-## Automated tests
+## 6. Run automated tests
 
-Run these on the host with the virtual environment activated:
+With the virtual environment activated on Windows, run:
 
 ```bat
 python -m pytest -q
 ```
 
-The tests cover the landing page, valid demo credentials, the failure marker, and the rule that submitted passwords must not be written to application logs.
+The current test suite contains five tests covering page loading, valid credentials, invalid passwords, invalid usernames, and missing form fields. The recorded local result was `5 passed`.
 
-## Repository safety checklist
+## Troubleshooting diary
 
-Before publishing, verify that you are not committing any of the following:
+The project includes a detailed account of issues encountered and how they were diagnosed:
 
-- `venv/` or `.venv/`
-- `.env` or local environment files
-- real API keys, tokens, passwords, cookies, or browser profiles
-- private IP/network details beyond what you intentionally want to document
-- terminal history, screenshots showing secrets, or unrelated files from Downloads
-- locally generated `users.txt` and `passwords.txt`
+- The original classroom target was not usable, so a controlled Flask target was created.
+- The VM could not reach a service bound only to Windows `127.0.0.1`; the Flask server was then bound to the Windows Host-Only adapter IP.
+- A shell `dquote>` prompt indicated an unclosed double quote; the incomplete command was cancelled and re-entered.
+- `curl` rejected malformed URLs when line-continuation backslashes were placed in a single-line command; running the request on one line fixed it.
+- The first wordlists accidentally stored multiple values on one line with backslashes. `cat -n` exposed the issue; rewriting one item per line allowed Medusa to process each value separately.
+- Tests initially expected HTTP `401`, but the lab's Medusa-compatible behavior returned `200` for both outcomes. The tests were updated to assert the intended status and the response marker.
 
-The tracked `examples/` wordlists contain only disposable demo values. The root-level working lists are ignored. If a real secret was committed previously, removing the file in a later commit is not enough; revoke/rotate the secret and purge history when necessary.
+For detail, see:
 
-## Further reading
+- [Lab diary: problems, hypotheses and fixes](diario-do-laboratorio.md)
+- [Reproduction guide](guia-de-reproducao.md)
+- [Security notes and limitations](seguranca-e-limitacoes.md)
 
-- [MDN: Sending form data](https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Sending_and_retrieving_form_data)
-- [Flask documentation](https://flask.palletsprojects.com/)
-- [Medusa project](https://github.com/jmk-foofus/medusa)
+## Security notes and limitations
 
-## License
+This is intentionally insecure training code, not a production authentication system. It uses one hard-coded demonstration credential pair, has no rate limiting, no temporary lockout, no delay between failures, no MFA, and no session-backed authentication flow. The application writes a local `login_attempts.log`; it records timestamps, usernames, and success/failure, but does not log submitted passwords. The log is excluded by `.gitignore`.
 
-MIT; see [LICENSE](LICENSE).
+For real applications, consider:
+
+- Rate limiting and progressive delays, designed to avoid abusive account lockouts.
+- Password hashing with a dedicated password-hashing algorithm such as Argon2id, scrypt, or bcrypt, with sensible parameters.
+- Multi-factor authentication where appropriate.
+- Monitoring and alerts for unusual authentication attempts.
+- Correct HTTP semantics and consistent response behavior.
+- Secure session management, CSRF protections when relevant, HTTPS, and careful secret handling.
+- Automated tests for controls such as rate limiting, session behavior, and error handling.
+
+The lab does not model a real database, production session management, MFA, a WAF, SSO, or the many other controls used by real applications. The small wordlists make this an educational functionality test, not a performance benchmark or a measure of real-world password strength.
+
+## Authorization and responsible use
+
+Use the commands only against this application in an isolated environment that you own or are explicitly authorized to test. Do not reuse these commands or credentials against third-party services. Stop the server after the exercise.
