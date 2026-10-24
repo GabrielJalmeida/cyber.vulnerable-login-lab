@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Login — Authorized Pentest Target</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="login-container">
+        <h1>Lab Login</h1>
+        <p class="subtitle">Isolated penetration-testing lab target</p>
+
+        {% if message %}
+        <div id="message" class="message {{ 'success' if success else 'failure' }}" role="alert">
+            {{ message }}
+        </div>
+        {% endif %}
+
+        <form id="login-form" action="/login" method="POST">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" autocomplete="off" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" autocomplete="off" required>
+
+            <button type="submit">Log in</button>
+        </form>
+
+        <p class="footnote">For authorized, isolated lab use only.</p>
+    </main>
+</body>
+</html>
