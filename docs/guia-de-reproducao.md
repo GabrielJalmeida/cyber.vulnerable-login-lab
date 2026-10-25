@@ -1,6 +1,6 @@
 # Guia de reprodução do laboratório
 
-Este guia complementa o README e organiza os testes em etapas verificáveis. Execute apenas na sua própria máquina/VM e na rede Host-Only criada para o laboratório.
+Este guia complementa o README e organiza os testes em etapas verificáveis. Execute apenas na sua própria máquina/VM e na rede Host-Only criada para o laboratório. Os comandos abaixo são executados a partir da raiz do repositório; a aplicação agora fica em `vulnerable/`.
 
 ## A. Conferir os endereços
 
@@ -23,9 +23,7 @@ Confirme que a interface Host-Only possui um endereço na mesma sub-rede. Neste 
 No CMD do Windows, dentro da pasta do projeto e com o venv ativado:
 
 ```bat
-set LAB_USERNAME=aluno
-set LAB_PASSWORD=Lab123!
-flask --app app run --host=192.168.219.1 --port=5000
+python vulnerable\app.py --host=192.168.219.1 --port=5000
 ```
 
 Ajuste o IP do `--host` caso o seu adaptador Host-Only use outro endereço. Mantenha o servidor ativo durante os testes.
@@ -49,7 +47,7 @@ cat -n users.txt
 cat -n passwords.txt
 ```
 
-Antes do Medusa, confirme que o primeiro arquivo tem 4 linhas e o segundo também. Não utilize `\` como delimitador dentro da linha. Para evitar publicar listas de trabalho, o `.gitignore` exclui os arquivos `users.txt` e `passwords.txt` da raiz.
+Antes do Medusa, confirme que o primeiro arquivo tem 4 linhas e o segundo também. Não utilize `\` como delimitador dentro da linha. Para evitar publicar listas de trabalho, o `.gitignore` exclui os arquivos `users.txt` e `passwords.txt` da raiz. As listas versionadas e didáticas ficam em `wordlists/`.
 
 ## E. Ver as opções do módulo e executar o teste
 
@@ -73,4 +71,4 @@ Se o resultado for diferente, não assuma uma causa. Verifique em ordem: (1) IP/
 
 - Pare o Flask com `Ctrl+C`.
 - Remova as listas locais de teste se não precisar mais delas: `rm users.txt passwords.txt`.
-- Não use este código em produção. Consulte `seguranca-e-limitacoes.md` para o plano de correção.
+- Não use este código em produção. Consulte `docs/seguranca-e-limitacoes.md` para o plano de correção.
