@@ -56,7 +56,7 @@ Para manter a comparação rastreável, a implementação original está em `vul
 
 ## Demonstração
 
-As capturas abaixo foram produzidas durante os exercícios no ambiente local. Elas documentam a interface web, a requisição HTTP observada no navegador, o resultado do teste controlado e os exercícios FTP/SMB; não representam uma demonstração online.
+A captura abaixo foi produzida durante o exercício no ambiente local. Ela documenta a interface web; não representa uma demonstração online.
 
 <p align="center">
   <img src="images/web/01-tela-login.png" alt="Tela de login do laboratório Flask com fundo grafite e borda neon multicolorida" width="100%">
