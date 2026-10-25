@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-labelledby="title desc">
+  <title id="title">Cyber Lab — Vulnerable Login Lab</title>
+  <desc id="desc">Banner editorial para um laboratório de autenticação, com fundo de papel mineral, tipografia grafite, anotação vermelha e diagrama técnico.</desc>
+  <rect width="1200" height="300" rx="18" fill="#F4F1E8"/>
+  <path d="M48 42 H1152 M48 258 H1152" stroke="#D6D0C5" stroke-width="1.5"/>
+  <path d="M48 42 V258 M1152 42 V258" stroke="#D6D0C5" stroke-width="1.5"/>
+  <text x="76" y="78" font-family="IBM Plex Mono, Consolas, monospace" font-size="16" letter-spacing="2.5" fill="#B42318">CADERNO 01 / AUTENTICAÇÃO</text>
+  <text x="74" y="151" font-family="IBM Plex Sans, Segoe UI, Arial, sans-serif" font-size="53" font-weight="700" letter-spacing="-1.5" fill="#1C1B18">CYBER LAB</text>
+  <text x="77" y="190" font-family="IBM Plex Sans, Segoe UI, Arial, sans-serif" font-size="22" fill="#5F5D57">Vulnerable Login Lab</text>
+  <text x="77" y="226" font-family="IBM Plex Sans, Segoe UI, Arial, sans-serif" font-size="17" fill="#1C1B18">Aprender na prática. Verificar com método.</text>
+  <g transform="translate(715 78)">
+    <text x="0" y="0" font-family="IBM Plex Mono, Consolas, monospace" font-size="13" letter-spacing="1.5" fill="#5F5D57">FLUXO DE AUTENTICAÇÃO</text>
+    <path d="M38 62 H370 V130 H38" fill="none" stroke="#817B70" stroke-width="2"/>
+    <path d="M370 62 l-10 -6 v12 z M38 130 l10 -6 v12 z" fill="#B42318"/>
+    <circle cx="38" cy="62" r="18" fill="#F4F1E8" stroke="#B42318" stroke-width="3"/>
+    <circle cx="204" cy="62" r="18" fill="#F4F1E8" stroke="#B42318" stroke-width="3"/>
+    <circle cx="370" cy="62" r="18" fill="#F4F1E8" stroke="#B42318" stroke-width="3"/>
+    <text x="38" y="67" text-anchor="middle" font-family="IBM Plex Mono, Consolas, monospace" font-size="13" font-weight="700" fill="#1C1B18">01</text>
+    <text x="204" y="67" text-anchor="middle" font-family="IBM Plex Mono, Consolas, monospace" font-size="13" font-weight="700" fill="#1C1B18">02</text>
+    <text x="370" y="67" text-anchor="middle" font-family="IBM Plex Mono, Consolas, monospace" font-size="13" font-weight="700" fill="#1C1B18">03</text>
+    <text x="38" y="101" text-anchor="middle" font-family="IBM Plex Sans, Segoe UI, Arial, sans-serif" font-size="15" fill="#1C1B18">Requisição</text>
+    <text x="204" y="101" text-anchor="middle" font-family="IBM Plex Sans, Segoe UI, Arial, sans-serif" font-size="15" fill="#1C1B18">Verificação</text>
+    <text x="370" y="101" text-anchor="middle" font-family="IBM Plex Sans, Segoe UI, Arial, sans-serif" font-size="15" fill="#1C1B18">Controle</text>
+    <text x="0" y="164" font-family="IBM Plex Mono, Consolas, monospace" font-size="12" fill="#5F5D57">LABORATÓRIO EDUCACIONAL / AMBIENTE ISOLADO</text>
+  </g>
+  <rect x="1080" y="54" width="34" height="5" fill="#B42318"/>
+</svg>

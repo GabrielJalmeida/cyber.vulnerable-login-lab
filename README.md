@@ -1,195 +1,426 @@
-# Vulnerable Login Lab — Flask, Kali Linux & Medusa
+<div align="center">
 
-> **Educational lab only.** This project intentionally contains a weak login flow for a controlled cybersecurity exercise. Run it only on a local machine or an isolated VirtualBox Host-Only/Internal network that you control. Do not expose it to the public internet or use it against systems without explicit authorization.
+<img src="docs/assets/banner.svg" alt="Cyber Lab — Vulnerable Login Lab: autenticação sob investigação" width="100%">
 
-A small Flask login application built to study the full path from an HTML form to an HTTP request, backend authentication logic, virtual networking, and controlled testing with Medusa's `web-form` module. The exercise also documents the troubleshooting process, including mistakes and how they were diagnosed.
+# Cyber Lab — Vulnerable Login Lab
 
-## Learning objectives
+**Um laboratório educacional para observar autenticação web, FTP e SMB em ambientes isolados.**
 
-- Inspect a form submission using browser DevTools (Network/Rede, request payload, HTTP status and response body).
-- Understand how `POST /login` sends the `username` and `password` fields to a Flask route.
-- Connect a Kali Linux VM to a service running on a Windows host through VirtualBox Host-Only networking.
-- Use a small, disposable username list and password list to test the lab form with Medusa.
-- Interpret application logs, distinguish HTTP status codes from response markers, and document failures as well as successful results.
-- Identify basic controls that a real authentication endpoint should implement.
+![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-3.0.3-222222?style=for-the-badge&logo=flask&logoColor=white)
+![Pytest](https://img.shields.io/badge/Pytest-8.3.3-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)
+![Kali Linux](https://img.shields.io/badge/Kali_Linux-Lab-557C94?style=for-the-badge&logo=kalilinux&logoColor=white)
+![Status](https://img.shields.io/badge/status-em%20desenvolvimento-B42318?style=for-the-badge)
 
-## Lab topology
+[Sobre](#sobre-o-projeto) · [Demonstração](#demonstração) · [Tecnologias](#tecnologias) · [Começando](#começando) · [Atividades](#atividades-do-laboratório) · [Testes](#testes) · [Roadmap](#roadmap)
 
-The original exercise used the following private Host-Only addresses. Your addresses may differ; use the values assigned to your own VirtualBox adapters.
+</div>
 
-| Component | Address / value | Role |
-|---|---|---|
-| Windows Host-Only adapter | `192.168.219.1` | Runs the Flask application |
-| Kali VM Host-Only adapter | `192.168.219.10` | Sends requests from the lab VM |
-| Flask port | `5000` | Web service |
-| Endpoint | `POST /login` | Accepts the login form |
+> [!CAUTION]
+> **Uso exclusivamente educacional e autorizado.** A aplicação Flask deste repositório é intencionalmente vulnerável. Execute-a e realize testes de autenticação apenas em máquinas próprias ou ambientes para os quais você tenha autorização explícita. Não exponha serviços vulneráveis à Internet, não use credenciais pessoais ou reutilizadas e não teste sistemas de terceiros.
 
-The target is **the Flask web form only**. The exercise did not compromise the Windows account, the Kali VM, or an operating-system login.
+> [!NOTE]
+> Este é um projeto acadêmico independente desenvolvido por Gabriel Almeida no contexto dos estudos de cibersegurança e de uma atividade da DIO. **Não é uma aplicação oficial da DIO, não possui integração com a plataforma e não representa endosso ou afiliação.**
 
-## Requirements
+## Sumário
 
-- Python and `pip`
-- Flask and pytest (installed from `requirements.txt`)
-- Oracle VirtualBox and Kali Linux
-- Medusa with the `web-form` module available in Kali
-- A Host-Only or Internal Network configured for the lab
+- [Sobre o projeto](#sobre-o-projeto)
+- [Demonstração](#demonstração)
+- [Escopo e estado dos cenários](#escopo-e-estado-dos-cenários)
+- [Tecnologias](#tecnologias)
+- [Arquitetura do laboratório](#arquitetura-do-laboratório)
+- [Começando](#começando)
+- [Uso da aplicação Flask](#uso-da-aplicação-flask)
+- [Atividades do laboratório](#atividades-do-laboratório)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [Testes](#testes)
+- [Segurança e limitações](#segurança-e-limitações)
+- [Roadmap](#roadmap)
+- [Documentação complementar](#documentação-complementar)
+- [Contribuição e licença](#contribuição-e-licença)
+- [Autor](#autor)
 
-## 1. Install dependencies on Windows
+---
 
-Open Command Prompt in the project directory:
+## Sobre o projeto
 
-```bat
-python -m venv venv
-venv\Scripts\activate
-python -m pip install -r requirements.txt
+O **Cyber Lab — Vulnerable Login Lab** reúne exercícios para compreender como sistemas de autenticação respondem a tentativas de login, como ferramentas de auditoria interagem com serviços de laboratório e como documentar resultados de forma reproduzível.
+
+A parte web utiliza uma aplicação própria em Flask, criada para observar o fluxo entre formulário HTML, requisição HTTP, validação no servidor e logs locais. Para os cenários de serviço, o laboratório registra verificações de conectividade e autenticação nos serviços FTP e SMB de um alvo virtual autorizado.
+
+O desafio da DIO permite adaptar o ambiente à realidade do estudante. Como o DVWA não chegou a funcionar como alvo no ambiente disponível, o cenário web foi adaptado para um formulário Flask próprio. Esta documentação registra essa adaptação e não afirma que o exercício web foi realizado no DVWA.
+
+O objetivo não é criar um sistema de autenticação de produção. É tornar visíveis as limitações de uma implementação vulnerável, praticar a leitura de evidências e preparar uma comparação futura com uma versão reforçada (`hardened`).
+
+## Demonstração
+
+As capturas abaixo foram produzidas durante os exercícios no ambiente local. Elas documentam a interface web, a requisição HTTP observada no navegador, o resultado do teste controlado e os exercícios FTP/SMB; não representam uma demonstração online.
+
+<p align="center">
+  <img src="images/web/01-tela-login.png" alt="Tela de login do laboratório Flask com fundo grafite e borda neon multicolorida" width="32%">
+  <img src="images/web/04-resultado-medusa.png" alt="Terminal do Kali com o resultado registrado do teste Medusa contra o formulário de laboratório" width="32%">
+  <img src="images/web/06-validacao-login-sucesso.png" alt="Formulário Flask mostrando a confirmação textual de login de demonstração bem-sucedido" width="32%">
+</p>
+
+**Galerias de evidências:** [Web — Flask e Medusa](images/web/) · [FTP](images/ftp/) · [SMB](images/smb/) · [Preparação e linha de base](images/desenvolvimento/)
+
+## Escopo e estado dos cenários
+
+| Cenário | O que foi feito | Estado registrado | Evidências |
+|---|---|---|---|
+| Web — Flask autoral | Inspeção pelo DevTools, verificação da resposta de falha, teste controlado com Medusa e validação final no formulário | Exercício realizado no ambiente local; seis capturas registram a interface, conectividade, requisição, execução do Medusa e validação do login | [Evidências web](images/web/) |
+| Atividade 1 — FTP | Verificação de conectividade, identificação da porta 21, teste com Medusa e nova conexão FTP para validar a autenticação | O Nmap identificou `21/tcp open ftp vsftpd 2.3.4`; o resultado do Medusa e a conexão FTP posterior foram registrados nas capturas | [Evidências FTP](images/ftp/) |
+| Atividade 3 — SMB | Verificação das portas 139/445, enumeração com `enum4linux`, teste com Medusa e validação posterior com `smbclient` | A execução e a validação foram relatadas e registradas nas capturas | [Evidências SMB](images/smb/) |
+| Versão `hardened` | Implementação separada com controles defensivos e interface editorial | Planejada; ainda não deve ser considerada implementada ou validada | Pendente |
+
+Os estados acima descrevem os registros disponíveis. A atualização deste README não significa que todos os testes de rede tenham sido repetidos durante a escrita da documentação. Consulte as capturas para conhecer o resultado efetivamente registrado em cada etapa.
+
+## Tecnologias
+
+<p align="center">
+  <img src="https://skillicons.dev/icons?i=python,flask,linux,git&perline=4" alt="Tecnologias: Python, Flask, Linux e Git">
+</p>
+
+| Tecnologia ou ferramenta | Papel no projeto |
+|---|---|
+| **Python** | Linguagem da aplicação Flask e dos testes automatizados |
+| **Flask 3.0.3** | Servidor web e rotas do formulário demonstrativo |
+| **Jinja2, HTML e CSS** | Formulário e apresentação da aplicação web |
+| **pytest 8.3.3** | Testes automatizados da versão vulnerável |
+| **Kali Linux** | Ambiente de laboratório para as ferramentas de teste |
+| **Medusa** | Testes controlados de autenticação nos alvos autorizados |
+| **Nmap** | Identificação de portas e serviços acessíveis |
+| **enum4linux e smbclient** | Consulta e validação no cenário SMB |
+| **Oracle VirtualBox** | Execução das máquinas virtuais e configuração de rede isolada |
+| **Git e GitHub** | Versionamento, documentação e compartilhamento do projeto |
+
+As dependências Python declaradas no repositório são Flask e pytest. As ferramentas de rede são instaladas e executadas na VM Kali e podem variar conforme a versão da distribuição.
+
+## Arquitetura do laboratório
+
+Os exercícios web e FTP/SMB foram realizados em configurações de rede diferentes. **Não misture os endereços históricos nem presuma que todos os adaptadores estão ativos simultaneamente.** Confirme os IPs atuais antes de reproduzir cada cenário.
+
+### Cenário web histórico
+
+```mermaid
+flowchart LR
+    K[Kali Linux<br/>192.168.219.10] -->|HTTP em rede Host-Only| W[Windows<br/>192.168.219.1:5000]
+    W --> F[Flask<br/>POST /login]
+    F --> L[Log local<br/>sem senha submetida]
 ```
 
-## 2. Start the Flask application
+O diagrama representa os endereços registrados no exercício web anterior. Substitua-os pelos valores atuais caso a rede virtual tenha mudado.
 
-The demo credentials are intentionally fixed in `app.py`:
+### Cenários FTP e SMB registrados
 
-- Username: `aluno`
-- Password: `Lab123!`
-
-They are disposable lab credentials, not values to reuse on any real account. The application does not read `LAB_USERNAME` or `LAB_PASSWORD` environment variables.
-
-Find the IPv4 address of the Windows Host-Only adapter with `ipconfig`. Then start the app bound to that specific address. The command below uses the address from the original exercise; replace it if your adapter uses a different IP:
-
-```bat
-python app.py --host 192.168.219.1 --port 5000
+```mermaid
+flowchart LR
+    K[Kali Linux<br/>192.168.56.102] -->|Rede de laboratório| T[Alvo virtual<br/>192.168.56.101]
+    T --> FTP[FTP<br/>TCP 21<br/>vsftpd 2.3.4 identificado]
+    T --> SMB[SMB<br/>TCP 139 e 445 abertos]
+    K -->|Validação do serviço| C[smbclient]
 ```
 
-The app defaults to `127.0.0.1` if no host is specified and refuses `0.0.0.0` when started through `python app.py`. Keep the Flask server running during the exercise. Stop it with `Ctrl+C` when finished.
+O endereço `192.168.56.101` foi o alvo utilizado nos registros dos exercícios. A identidade exata da VM que executava esses serviços deve ser conferida no ambiente atual. **Metasploitable 2 é um sistema convidado deliberadamente vulnerável; não é sinônimo do Ubuntu Server que possa hospedar ou executar a máquina virtual.**
 
-Do not bind this intentionally vulnerable app to a public or bridged interface. Keep the VM network isolated and do not expose port `5000` to untrusted networks.
+## Começando
 
-## 3. Inspect the HTTP request in a browser
+### Pré-requisitos
 
-Open the login page in a browser and press `F12`. Select **Network / Rede**, submit a login attempt, and inspect the `/login` request.
+- Windows com Python e `pip` para executar o cenário Flask.
+- Oracle VirtualBox e Kali Linux para reproduzir os exercícios de rede.
+- Medusa, Nmap e, para o cenário SMB, `enum4linux` e `smbclient` disponíveis no Kali.
+- Uma rede Host-Only ou Internal Network configurada para o laboratório.
+- Máquinas-alvo próprias ou autorização explícita para os testes.
 
-Expected request details:
+> [!IMPORTANT]
+> Os cenários de rede devem permanecer isolados. Não use adaptadores Bridged para expor deliberadamente serviços vulneráveis e confirme IP, serviço e alvo antes de qualquer teste ativo.
 
-- Method: `POST`
-- Path: `/login`
-- Form fields: `username` and `password`
-- Content type: usually `application/x-www-form-urlencoded`
-- Failed-login response marker: `LOGIN_FAILED - Invalid username or password.`
-- Successful-login response marker: `LOGIN_OK - Access granted.`
-
-For compatibility with the particular Medusa module used in the exercise, this lab returns HTTP `200 OK` for both valid and invalid credentials and distinguishes the result by a marker in the response body. This is a deliberate test-lab choice, **not a production recommendation**. Real applications should have a clear HTTP contract and appropriate authentication protections.
-
-You can make a single manual request from Kali to verify the endpoint. Use only the demo values configured in this project:
-
-```bash
-curl -i -X POST --data-urlencode 'username=aluno' --data-urlencode 'password=Lab123!' http://192.168.219.1:5000/login
-```
-
-## 4. Review the sample wordlists
-
-The repository contains disposable demonstration lists:
-
-- [`wordlists/usernames.txt`](wordlists/usernames.txt): 4 usernames, one per line
-- [`wordlists/passwords.txt`](wordlists/passwords.txt): 6 passwords, one per line
-
-That is up to **4 × 6 = 24 candidate pairs**. These lists are intentionally small and are only for this lab. The working lists created at the repository root (`users.txt` and `passwords.txt`) are local exercise files and should not be committed.
-
-To use the repository's sample lists directly from Kali, clone the repository inside the VM and enter its directory:
+### 1. Clonar o repositório
 
 ```bash
 git clone https://github.com/GabrielJalmeida/cyber.vulnerable-login-lab.git
 cd cyber.vulnerable-login-lab
 ```
 
-Inspect the sample files with:
+### 2. Preparar o ambiente Python no Windows
 
-```bash
-cat -n wordlists/usernames.txt
-cat -n wordlists/passwords.txt
+Abra o CMD na pasta do projeto:
+
+```bat
+py -m venv venv
+venv\Scripts\activate
+python -m pip install -r requirements.txt
 ```
 
-The historical exercise used two local files containing four entries each. The public sample files were later adjusted to four usernames and six passwords, so reproducing the run with the current repository lists tests up to 24 combinations rather than 16.
+O arquivo `requirements.txt` fixa as versões Flask `3.0.3` e pytest `8.3.3`.
 
-## 5. Run the controlled Medusa exercise
+### 3. Executar a aplicação localmente
 
-First inspect the installed module's supported options:
+Para manter o serviço acessível somente no próprio Windows, execute:
+
+```bat
+python app.py
+```
+
+Por padrão, a aplicação usa `127.0.0.1` e a porta `5000`. Acesse `http://127.0.0.1:5000` no navegador.
+
+Para reproduzir o exercício histórico a partir do Kali, o servidor precisa escutar no endereço atual do adaptador Host-Only do Windows. No exemplo abaixo, `192.168.219.1` é o IP registrado no exercício antigo — confirme o valor com `ipconfig` antes de usar:
+
+```bat
+python app.py --host 192.168.219.1 --port 5000
+```
+
+O ponto de entrada `python app.py` recusa `0.0.0.0`. Não contorne essa proteção nem publique a aplicação vulnerável em uma interface pública. Encerre o servidor com <kbd>Ctrl</kbd> + <kbd>C</kbd> ao terminar.
+
+## Uso da aplicação Flask
+
+### Fluxo HTTP
+
+- `GET /` apresenta o formulário de login.
+- `POST /login` recebe os campos `username` e `password`.
+- A aplicação devolve o marcador `LOGIN_OK` quando a credencial demonstrativa é aceita e `LOGIN_FAILED` quando é rejeitada.
+- Na implementação didática, os dois caminhos usam HTTP `200`; a distinção é feita pelo corpo da resposta para facilitar o exercício com o módulo web do Medusa. Isso não é uma recomendação para sistemas de produção.
+- O log local `login_attempts.log` registra horário, usuário enviado e resultado, mas não deve registrar a senha submetida. O `.gitignore` exclui arquivos `*.log`.
+
+A conta demonstrativa está definida no código e é exclusiva do laboratório. Nunca reutilize essa credencial em serviços reais.
+
+### Inspecionar uma requisição manual
+
+Com o Flask em execução no próprio Windows, envie uma requisição de teste para o endereço local:
+
+```bash
+curl -i -X POST --data-urlencode 'username=aluno' --data-urlencode 'password=Lab123!' http://127.0.0.1:5000/login
+```
+
+Para testar a partir do Kali, substitua o endereço local pelo IP Host-Only do Windows confirmado no ambiente. Use apenas a credencial fictícia definida no código do laboratório.
+
+### Observar a requisição no navegador
+
+1. Abra a página de login.
+2. Pressione <kbd>F12</kbd> e selecione **Network / Rede**.
+3. Envie uma tentativa de login.
+4. Inspecione a requisição `POST /login`, os campos do formulário, o status HTTP e o marcador de resposta.
+
+<details>
+<summary><strong>Ver reprodução histórica do teste web com Medusa</strong></summary>
+
+O procedimento a seguir descreve o exercício histórico contra o formulário Flask autoral, não contra a plataforma DIO ou qualquer serviço público. Execute somente no laboratório autorizado.
+
+Primeiro, consulte as opções do módulo instalado no Kali:
 
 ```bash
 medusa -M web-form -q
 ```
 
-With the Flask service running on the Windows Host-Only address, run the test **only against this lab target**:
+As wordlists públicas do projeto ficam em `wordlists/usernames.txt` e `wordlists/passwords.txt`. Elas são listas curtas de demonstração. O teste histórico usou o endereço Host-Only registrado para o Windows; confirme o IP atual antes da reprodução:
 
 ```bash
 medusa -h 192.168.219.1 -n 5000 -U wordlists/usernames.txt -P wordlists/passwords.txt -M web-form -m FORM:login -m 'FORM-DATA:POST?username=&password=' -m 'DENY-SIGNAL:LOGIN_FAILED' -t 1
 ```
 
-Replace `192.168.219.1` if your own Host-Only adapter has a different address. Do not replace the target with a public website, campus service, or another person's system.
+Esse comando é um exemplo histórico para o alvo Flask local. A sintaxe e as opções podem variar com a versão instalada; confira a ajuda local do Medusa antes de usar. Não direcione o comando a sites, contas, serviços da faculdade, empresas ou sistemas de terceiros.
 
-| Option | Purpose |
+O resultado documentado anteriormente indicou a credencial demonstrativa, e o log Flask registrou uma requisição originada do Kali. O exercício não comprova comprometimento do Windows, do Kali ou de outro serviço.
+
+</details>
+
+## Atividades do laboratório
+
+### Cenário web — formulário Flask e Medusa
+
+O cenário web foi realizado contra a aplicação Flask própria, hospedada no Windows e acessada a partir do Kali pela rede Host-Only do laboratório. O exercício incluiu a análise do formulário no navegador, a observação da requisição HTTP, a tentativa controlada com o Medusa e a confirmação final no formulário.
+
+**Resultado e interpretação:**
+
+- O navegador enviou uma requisição `POST` para `/login`.
+- A tentativa com credenciais incorretas devolveu o marcador `LOGIN_FAILED` com HTTP `200`. O status `200`, isoladamente, não demonstra autenticação bem-sucedida; o conteúdo da resposta indicou a falha lógica esperada.
+- A execução do Medusa reportou a credencial demonstrativa do laboratório como encontrada.
+- Uma submissão posterior no próprio formulário retornou `LOGIN_OK`, confirmando o resultado no alvo web.
+- O exercício demonstra a fragilidade de um login sem limitação de tentativas; não demonstra comprometimento do Windows nem acesso a outros serviços.
+
+| Evidência | O que documenta |
 |---|---|
-| `-h` | Address of the lab server |
-| `-n 5000` | TCP port of the Flask service |
-| `-U` | Username file, one entry per line |
-| `-P` | Password file, one entry per line |
-| `-M web-form` | Selects Medusa's web-form module |
-| `FORM:login` | Targets the `/login` path |
-| `FORM-DATA:POST?username=&password=` | Sends a POST with the expected form fields |
-| `DENY-SIGNAL:LOGIN_FAILED` | Text used by this test to identify an unsuccessful login |
-| `-t 1` | Keeps the test sequential with low concurrency |
+| [01 — Tela de login](images/web/01-tela-login.png) | Aparência da aplicação antes dos testes |
+| [02 — Conectividade Kali](images/web/02-conectividade-kali.png) | Verificação da comunicação e acesso HTTP ao alvo |
+| [03 — Análise no F12](images/web/03-analise-requisicao-f12.png) | Método `POST`, status HTTP e resposta `LOGIN_FAILED` observados no navegador |
+| [04 — Resultado Medusa](images/web/04-resultado-medusa.png) | Registro da execução do teste controlado |
+| [05 — Credencial encontrada](images/web/05-login-encontrado.png) | Saída que identifica a credencial fictícia do laboratório |
+| [06 — Login confirmado](images/web/06-validacao-login-sucesso.png) | Confirmação visual de `LOGIN_OK` no formulário |
 
-### Result observed during the exercise
+As capturas representam o que foi registrado durante a sessão do exercício. Endereços IP privados mostrados nas imagens pertencem à configuração de laboratório usada naquele momento; confirme os endereços atuais antes de repetir o cenário.
 
-The successful run reported a result equivalent to:
+### Atividade 1 — FTP com Kali Linux e Medusa
+
+**Procedimento registrado:**
+
+1. Confirmar os endereços atuais e a conectividade entre o Kali e o alvo autorizado.
+2. Verificar a porta TCP 21 com Nmap.
+3. Conectar ao serviço FTP e confirmar que ele responde.
+4. Usar listas pequenas e fictícias exclusivas do laboratório.
+5. Conferir a ajuda da versão local do Medusa antes do teste controlado.
+6. Validar o resultado conectando-se novamente ao serviço FTP.
+7. Encerrar a sessão com `quit` e revisar as capturas.
+
+**Resultados registrados:**
+
+- Kali: `192.168.56.102`.
+- Alvo de laboratório: `192.168.56.101`.
+- O `ping` recebeu respostas.
+- O Nmap identificou `21/tcp open ftp vsftpd 2.3.4`.
+- O resultado do Medusa e a conexão FTP posterior foram registrados nas capturas da atividade.
+
+A autenticação bem-sucedida comprova acesso ao **serviço FTP com a conta testada**. Não comprova, por si só, acesso a um shell, terminal ou controle administrativo do sistema operacional.
+
+| Evidência | O que documenta |
+|---|---|
+| [01 — Conectividade e Nmap](images/ftp/01-conectividade-e-nmap.png) | Conectividade e identificação do serviço FTP |
+| [02 — Medusa](images/ftp/02-medusa-conectando.png) | Execução e resultado registrado do teste com Medusa |
+| [03 — FTP conectado](images/ftp/03-ftp-conectado.png) | Validação posterior da autenticação FTP |
+
+### Atividade 3 — SMB, enumeração e validação com `smbclient`
+
+**Procedimento registrado:**
+
+1. Confirmar o alvo autorizado e verificar as portas TCP 139 e 445.
+2. Executar `enum4linux` para consultar informações SMB disponíveis conforme a configuração do serviço.
+3. Preparar listas pequenas de usuários e senhas fictícios.
+4. Conferir a ajuda local do Medusa e usar o módulo SMB compatível com a versão instalada.
+5. Registrar o resultado observado e classificar a técnica conforme a ordem real das tentativas. O uso de `-U` e `-P`, isoladamente, não comprova password spraying.
+6. Usar `smbclient` para validar a autenticação e/ou consultar os compartilhamentos permitidos pela conta testada.
+7. Revisar e sanitizar as capturas.
+
+**Resultados registrados:**
+
+- Kali: `192.168.56.102`.
+- Alvo de laboratório: `192.168.56.101`.
+- O Nmap indicou as portas TCP 139 e 445 abertas.
+- A enumeração com `enum4linux`, o teste controlado com Medusa e a validação posterior com `smbclient` foram registrados nas evidências da atividade.
+
+Uma resposta positiva do `smbclient` pode confirmar autenticação ou listagem de compartilhamentos no contexto testado. Isso, por si só, **não significa que foi aberta uma sessão de terminal no sistema inteiro**. A conclusão deve corresponder exatamente ao que aparece na captura.
+
+| Evidência | O que documenta |
+|---|---|
+| [01 — Nmap SMB](images/smb/01-nmap-smb.png) | Identificação das portas SMB |
+| [02 — Preparação das listas](images/smb/02-criando-textos.png) | Preparação dos arquivos de texto usados no exercício |
+| [03 — Medusa](images/smb/03-medusa-conectado.png) | Execução e resultado registrado do teste com Medusa |
+| [04 — Validação com smbclient](images/smb/04-validacao-smbclient.png) | Validação posterior no serviço SMB |
+
+<details>
+<summary><strong>Comandos de consulta usados nos cenários FTP e SMB</strong></summary>
+
+Use os endereços atuais confirmados do laboratório; `192.168.56.101` é o endereço histórico registrado neste exercício.
+
+Verificar FTP:
+
+```bash
+nmap -Pn -sV -p 21 192.168.56.101
+ftp 192.168.56.101
+```
+
+Verificar SMB:
+
+```bash
+nmap -Pn -sV -p 139,445 192.168.56.101
+enum4linux -a 192.168.56.101
+```
+
+Consultar compartilhamentos SMB com uma conta fictícia autorizada:
+
+```bash
+smbclient -L //192.168.56.101 -U USUARIO_DE_TESTE
+```
+
+Esses comandos consultam o serviço e não substituem a análise do resultado. Antes de executar qualquer tentativa de credenciais, confirme o escopo, a versão da ferramenta, o alvo e o uso exclusivo de contas/listas sintéticas.
+
+</details>
+
+## Estrutura do projeto
 
 ```text
-ACCOUNT FOUND: [web-form] Host: 192.168.219.1 User: aluno Password: Lab123! [SUCCESS]
+cyber.vulnerable-login-lab/
+├── .gitignore                         # Ignora ambientes, caches, logs e listas temporárias
+├── README.md                          # Visão geral e reprodução
+├── app.py                             # Aplicação Flask deliberadamente vulnerável
+├── requirements.txt                   # Flask e pytest
+├── diario-do-laboratorio.md           # Histórico do exercício web
+├── guia-de-reproducao.md              # Guia histórico de reprodução web
+├── seguranca-e-limitacoes.md          # Riscos conhecidos e recomendações
+├── static/
+│   └── style.css                      # Estilos da aplicação Flask
+├── templates/
+│   └── login.html                     # Formulário HTML
+├── tests/
+│   └── test_app.py                    # Testes da aplicação vulnerável
+├── wordlists/
+│   ├── usernames.txt                 # Lista curta de demonstração
+│   └── passwords.txt                 # Lista curta de demonstração
+├── images/
+│   ├── desenvolvimento/              # Evidência da linha de base
+│   ├── web/                          # Capturas do formulário Flask e do teste Medusa
+│   ├── ftp/                          # Capturas da Atividade 1
+│   └── smb/                          # Capturas da Atividade 3
+└── docs/
+    └── assets/
+        └── banner.svg                 # Banner editorial do README
 ```
 
-The Windows Flask log also showed a `POST /login` request from the Kali Host-Only address. Together, these observations confirmed that the VM reached the local service and Medusa recognized the demo credential configured in the form.
+As listas públicas em `wordlists/` são artefatos didáticos versionados. Listas temporárias criadas para execuções locais devem permanecer fora do Git. O `.gitignore` contém regras para nomes de listas temporárias usados durante os exercícios.
 
-## 6. Run automated tests
+## Testes
 
-With the virtual environment activated on Windows, run:
+Na pasta do projeto, com o ambiente virtual disponível, execute:
 
 ```bat
-python -m pytest -q
+venv\Scripts\python.exe -m pytest -q
 ```
 
-The current test suite contains five tests covering page loading, valid credentials, invalid passwords, invalid usernames, and missing form fields. The recorded local result was `5 passed`.
+A suíte existente contém cinco testes para carregamento da página, credenciais válidas, senha inválida, usuário inválido e campos ausentes. Após qualquer alteração em HTML, CSS ou Python, execute os testes novamente no ambiente local. Uma execução anterior passou nos cinco testes, mas esse resultado não substitui a verificação do estado atual do repositório.
 
-## Troubleshooting diary
+## Segurança e limitações
 
-The project includes a detailed account of issues encountered and how they were diagnosed:
+A aplicação Flask é intencionalmente vulnerável e serve apenas como alvo de estudo. Ela não deve ser usada em produção. Na versão original documentada:
 
-- The original classroom target was not usable, so a controlled Flask target was created.
-- The VM could not reach a service bound only to Windows `127.0.0.1`; the Flask server was then bound to the Windows Host-Only adapter IP.
-- A shell `dquote>` prompt indicated an unclosed double quote; the incomplete command was cancelled and re-entered.
-- `curl` rejected malformed URLs when line-continuation backslashes were placed in a single-line command; running the request on one line fixed it.
-- The first wordlists accidentally stored multiple values on one line with backslashes. `cat -n` exposed the issue; rewriting one item per line allowed Medusa to process each value separately.
-- Tests initially expected HTTP `401`, but the lab's Medusa-compatible behavior returned `200` for both outcomes. The tests were updated to assert the intended status and the response marker.
+- A credencial demonstrativa está definida em código e não deve ser reutilizada em nenhum serviço real.
+- Não há limitação de tentativas, bloqueio temporário ou atraso progressivo.
+- Não há banco de dados nem autenticação baseada em sessão de produção.
+- Não há MFA; a aplicação não implementa CSRF, HTTPS/TLS ou cabeçalhos de segurança de produção.
+- HTTP `200` é usado tanto no caminho de sucesso como no de falha para facilitar a leitura do resultado no exercício web. Isso é uma decisão didática, não uma recomendação de contrato HTTP real.
+- O log local não deve conter a senha submetida; revise os logs antes de compartilhá-los e mantenha-os fora do Git.
+- Os resultados FTP/SMB se limitam aos serviços e às credenciais testados. Não implicam controle do sistema operacional.
 
-For detail, see:
+Para aplicações reais, considere hashing de senhas com uma biblioteca apropriada (por exemplo, Argon2id, scrypt ou bcrypt), rate limiting com recuperação segura, MFA quando aplicável, sessões e cookies seguros, proteção CSRF, HTTPS, logs sem segredos, tratamento de erros e testes de regressão.
 
-- [Lab diary: problems, hypotheses and fixes](diario-do-laboratorio.md)
-- [Reproduction guide](guia-de-reproducao.md)
-- [Security notes and limitations](seguranca-e-limitacoes.md)
+> [!WARNING]
+> A identificação `vsftpd 2.3.4` merece cautela: a [CVE-2011-2523](https://nvd.nist.gov/vuln/detail/CVE-2011-2523) descreve uma backdoor em um pacote distribuído em uma janela específica (downloads entre 30/06 e 03/07/2011). O banner identificado pelo Nmap, isoladamente, não comprova que o binário do alvo contém essa backdoor. Essa questão é distinta do exercício de brute force. O escopo deste trabalho é observar autenticação nos serviços de laboratório; não é necessário investigar nem explorar a backdoor para concluir as atividades documentadas.
 
-## Security notes and limitations
+## Roadmap
 
-This is intentionally insecure training code, not a production authentication system. It uses one hard-coded demonstration credential pair, has no rate limiting, no temporary lockout, no delay between failures, no MFA, and no session-backed authentication flow. The application writes a local `login_attempts.log`; it records timestamps, usernames, and success/failure, but does not log submitted passwords. The log is excluded by `.gitignore`.
+- [x] Preservar a implementação Flask vulnerável e registrar sua linha de base de cinco testes.
+- [x] Documentar a adaptação do cenário web porque o DVWA não pôde ser executado neste ambiente.
+- [x] Registrar evidências dos exercícios web, FTP e SMB, incluindo a validação SMB com `smbclient`.
+- [x] Melhorar a apresentação visual do formulário vulnerável sem alterar a rota nem os nomes dos campos utilizados no exercício.
+- [x] Preparar regras do `.gitignore` para listas temporárias de laboratório.
+- [ ] Revisar e alinhar os guias complementares com o código e o ambiente documentado.
+- [ ] Implementar a aplicação `hardened` em diretório separado, sem alterar a linha de base vulnerável.
+- [ ] Criar testes para limitação e recuperação de tentativas, logs sem segredos, sessão e demais controles adotados.
+- [ ] Comparar as versões vulnerável e reforçada com evidências reproduzíveis.
+- [ ] Revisar dependências, segredos, capturas e diff antes da publicação final.
 
-For real applications, consider:
+## Documentação complementar
 
-- Rate limiting and progressive delays, designed to avoid abusive account lockouts.
-- Password hashing with a dedicated password-hashing algorithm such as Argon2id, scrypt, or bcrypt, with sensible parameters.
-- Multi-factor authentication where appropriate.
-- Monitoring and alerts for unusual authentication attempts.
-- Correct HTTP semantics and consistent response behavior.
-- Secure session management, CSRF protections when relevant, HTTPS, and careful secret handling.
-- Automated tests for controls such as rate limiting, session behavior, and error handling.
+- [Diário do laboratório](diario-do-laboratorio.md) — problemas encontrados, hipóteses e correções durante o exercício Flask.
+- [Guia de reprodução](guia-de-reproducao.md) — etapas históricas de configuração e teste web; confira os comandos antes de executá-los, pois algumas anotações antigas podem não corresponder ao código atual.
+- [Segurança e limitações](seguranca-e-limitacoes.md) — fraquezas intencionais, riscos e controles recomendados.
 
-The lab does not model a real database, production session management, MFA, a WAF, SSO, or the many other controls used by real applications. The small wordlists make this an educational functionality test, not a performance benchmark or a measure of real-world password strength.
+## Contribuição e licença
 
-## Authorization and responsible use
+Este projeto é uma atividade acadêmica em evolução. Sugestões podem ser registradas por meio de issues, desde que não incluam credenciais reais, tokens, cookies, dados pessoais ou logs brutos desnecessários.
 
-Use the commands only against this application in an isolated environment that you own or are explicitly authorized to test. Do not reuse these commands or credentials against third-party services. Stop the server after the exercise.
+**Licença:** não há um arquivo `LICENSE` identificado na estrutura atual do repositório. Até que uma licença seja adicionada, não presuma que a publicação do código concede autorização geral para reutilização ou redistribuição.
+
+## Autor
+
+**Gabriel Almeida** — [@GabrielJalmeida no GitHub](https://github.com/GabrielJalmeida)
+
+Este laboratório foi desenvolvido para fins educacionais, com escopo controlado e registro explícito do que foi observado, do que foi adaptado e do que permanece planejado.

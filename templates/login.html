@@ -1,33 +1,83 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab Login — Authorized Pentest Target</title>
+    <meta name="theme-color" content="#0b0e12">
+    <meta name="description" content="Interface de autenticação para um laboratório didático local.">
+    <title>Lab Login — Cyber Lab</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <main class="login-container">
-        <h1>Lab Login</h1>
-        <p class="subtitle">Isolated penetration-testing lab target</p>
+    <div class="ambient-points" aria-hidden="true">
+        <span class="point point-01"></span><span class="point point-02"></span>
+        <span class="point point-03"></span><span class="point point-04"></span>
+        <span class="point point-05"></span><span class="point point-06"></span>
+        <span class="point point-07"></span><span class="point point-08"></span>
+        <span class="point point-09"></span><span class="point point-10"></span>
+        <span class="point point-11"></span><span class="point point-12"></span>
+        <span class="point point-13"></span><span class="point point-14"></span>
+        <span class="point point-15"></span><span class="point point-16"></span>
+        <span class="point point-17"></span><span class="point point-18"></span>
+        <span class="point point-19"></span><span class="point point-20"></span>
+        <span class="point point-21"></span><span class="point point-22"></span>
+    </div>
 
-        {% if message %}
-        <div id="message" class="message {{ 'success' if success else 'failure' }}" role="alert">
-            {{ message }}
-        </div>
-        {% endif %}
+    <main class="stage">
+        <section class="login-frame" aria-labelledby="login-title">
+            <div class="login-surface">
+                <header class="brand-row">
+                    <span class="brand-mark" aria-hidden="true">
+                        <svg viewBox="0 0 36 36" fill="none">
+                            <path d="M18 3.8 30.3 10.9v14.2L18 32.2 5.7 25.1V10.9L18 3.8Z" stroke="currentColor" stroke-width="1.4" />
+                            <path d="M13 14.1a5.2 5.2 0 0 1 9.1-1.2M23 21.9a5.2 5.2 0 0 1-9.1 1.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                            <circle cx="18" cy="18" r="2.2" fill="currentColor" />
+                        </svg>
+                    </span>
+                    <span class="brand-name">CYBER <b>LAB</b></span>
+                    <span class="brand-indicator" aria-hidden="true"><i></i></span>
+                </header>
 
-        <form id="login-form" action="/login" method="POST">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" autocomplete="off" required>
+                <div class="intro">
+                    <p class="eyebrow">AUTHENTICATION NODE <span>// 01</span></p>
+                    <h1 id="login-title">Lab Login</h1>
+                    <p class="subtitle">Entre para continuar.</p>
+                </div>
 
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" autocomplete="off" required>
+                {% if message %}
+                <div id="message" class="message {{ 'success' if success else 'failure' }}" role="status" aria-live="polite">
+                    <span class="message-indicator" aria-hidden="true"></span>
+                    <span>{{ message }}</span>
+                </div>
+                {% endif %}
 
-            <button type="submit">Log in</button>
-        </form>
+                <form id="login-form" action="/login" method="POST">
+                    <div class="field-group">
+                        <label for="username">Usuário</label>
+                        <input type="text" id="username" name="username" placeholder="Digite seu usuário" autocomplete="off" autocapitalize="none" spellcheck="false" required>
+                    </div>
 
-        <p class="footnote">For authorized, isolated lab use only.</p>
+                    <div class="field-group">
+                        <label for="password">Senha</label>
+                        <input type="password" id="password" name="password" placeholder="Digite sua senha" autocomplete="off" required>
+                    </div>
+
+                    <button type="submit">
+                        <span>Continuar</span>
+                        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                            <path d="M3.5 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                </form>
+
+                <footer class="card-footer">
+                    <span class="footer-dot" aria-hidden="true"></span>
+                    <span>LOCAL LAB</span>
+                    <span class="footer-divider" aria-hidden="true"></span>
+                    <span>AUTHORIZED ACCESS ONLY</span>
+                </footer>
+            </div>
+        </section>
     </main>
 </body>
 </html>
