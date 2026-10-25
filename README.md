@@ -59,9 +59,7 @@ Para manter a comparação rastreável, a implementação original está em `vul
 As capturas abaixo foram produzidas durante os exercícios no ambiente local. Elas documentam a interface web, a requisição HTTP observada no navegador, o resultado do teste controlado e os exercícios FTP/SMB; não representam uma demonstração online.
 
 <p align="center">
-  <img src="images/web/01-tela-login.png" alt="Tela de login do laboratório Flask com fundo grafite e borda neon multicolorida" width="32%">
-  <img src="images/web/04-resultado-medusa.png" alt="Terminal do Kali com o resultado registrado do teste Medusa contra o formulário de laboratório" width="32%">
-  <img src="images/web/06-validacao-login-sucesso.png" alt="Formulário Flask mostrando a confirmação textual de login de demonstração bem-sucedido" width="32%">
+  <img src="images/web/01-tela-login.png" alt="Tela de login do laboratório Flask com fundo grafite e borda neon multicolorida" width="100%">
 </p>
 
 **Galerias de evidências:** [Web — Flask e Medusa](images/web/) · [FTP](images/ftp/) · [SMB](images/smb/) · [Preparação e linha de base](images/desenvolvimento/)
