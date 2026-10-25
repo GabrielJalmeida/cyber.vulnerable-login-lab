@@ -1,5 +1,7 @@
 # Diário de laboratório: do formulário ao teste com Medusa
 
+> Nota de organização: os caminhos dos comandos foram atualizados após mover a linha de base para `vulnerable/`. A execução original ocorreu antes dessa reorganização.
+
 - **Data do exercício:** 24 de outubro de 2026
 - **Alvo:** aplicação Flask criada para a aula, executada no Windows do próprio aluno
 - **Cliente de teste:** Kali Linux em uma VM Oracle VirtualBox
@@ -24,13 +26,13 @@ O exercício terminou com o Medusa lendo duas listas (quatro usuários e quatro 
 
 ### 2. Preparação do backend
 
-O ambiente foi preparado no Windows usando um ambiente virtual Python e as dependências declaradas no `requirements.txt`:
+O ambiente foi preparado no Windows usando um ambiente virtual Python e as dependências declaradas no `vulnerable/requirements.txt`:
 
 ```bat
 python -m venv venv
 venv\Scripts\activate
-pip install -r requirements.txt
-python app.py
+pip install -r vulnerable/requirements.txt
+python vulnerable/app.py
 ```
 
 O terminal confirmou que Flask e pytest foram instalados e que o servidor de desenvolvimento iniciou. Como em qualquer servidor de desenvolvimento, isso é apropriado para treinamento local, não para implantação em produção.
@@ -44,7 +46,7 @@ O terminal confirmou que Flask e pytest foram instalados e que o servidor de des
 **Correção:** o Flask foi iniciado ligado ao endereço Host-Only do Windows:
 
 ```bat
-flask run --host=192.168.219.1 --port=5000
+python vulnerable/app.py --host=192.168.219.1 --port=5000
 ```
 
 O log do Flask passou a registrar requisições originadas de `192.168.219.10` para `/` e, depois, para `/login`.

@@ -50,7 +50,9 @@ A parte web utiliza uma aplicação própria em Flask, criada para observar o fl
 
 O desafio da DIO permite adaptar o ambiente à realidade do estudante. Como o DVWA não chegou a funcionar como alvo no ambiente disponível, o cenário web foi adaptado para um formulário Flask próprio. Esta documentação registra essa adaptação e não afirma que o exercício web foi realizado no DVWA.
 
-O objetivo não é criar um sistema de autenticação de produção. É tornar visíveis as limitações de uma implementação vulnerável, praticar a leitura de evidências e preparar uma comparação futura com uma versão reforçada (`hardened`).
+O objetivo não é criar um sistema de autenticação de produção. É tornar visíveis as limitações de uma implementação vulnerável, praticar a leitura de evidências e comparar essa linha de base com uma versão reforçada.
+
+Para manter a comparação rastreável, a implementação original está em `vulnerable/`. A pasta `hardened/` contém apenas a estrutura inicial e a mesma camada visual: **a implementação defensiva ainda não existe e não deve ser considerada segura nem executável**. As duas versões terão código e testes separados.
 
 ## Demonstração
 
@@ -71,7 +73,7 @@ As capturas abaixo foram produzidas durante os exercícios no ambiente local. El
 | Web — Flask autoral | Inspeção pelo DevTools, verificação da resposta de falha, teste controlado com Medusa e validação final no formulário | Exercício realizado no ambiente local; seis capturas registram a interface, conectividade, requisição, execução do Medusa e validação do login | [Evidências web](images/web/) |
 | Atividade 1 — FTP | Verificação de conectividade, identificação da porta 21, teste com Medusa e nova conexão FTP para validar a autenticação | O Nmap identificou `21/tcp open ftp vsftpd 2.3.4`; o resultado do Medusa e a conexão FTP posterior foram registrados nas capturas | [Evidências FTP](images/ftp/) |
 | Atividade 3 — SMB | Verificação das portas 139/445, enumeração com `enum4linux`, teste com Medusa e validação posterior com `smbclient` | A execução e a validação foram relatadas e registradas nas capturas | [Evidências SMB](images/smb/) |
-| Versão `hardened` | Implementação separada com controles defensivos e interface editorial | Planejada; ainda não deve ser considerada implementada ou validada | Pendente |
+| Versão `hardened` | Estrutura inicial com HTML/CSS compartilhando a direção visual | Esqueleto criado; ainda sem backend, controles defensivos ou testes próprios | [Estado da estrutura](hardened/README.md) |
 
 Os estados acima descrevem os registros disponíveis. A atualização deste README não significa que todos os testes de rede tenham sido repetidos durante a escrita da documentação. Consulte as capturas para conhecer o resultado efetivamente registrado em cada etapa.
 
@@ -150,17 +152,17 @@ Abra o CMD na pasta do projeto:
 ```bat
 py -m venv venv
 venv\Scripts\activate
-python -m pip install -r requirements.txt
+python -m pip install -r vulnerable/requirements.txt
 ```
 
-O arquivo `requirements.txt` fixa as versões Flask `3.0.3` e pytest `8.3.3`.
+O arquivo `vulnerable/requirements.txt` fixa as versões Flask `3.0.3` e pytest `8.3.3`.
 
 ### 3. Executar a aplicação localmente
 
 Para manter o serviço acessível somente no próprio Windows, execute:
 
 ```bat
-python app.py
+python vulnerable/app.py
 ```
 
 Por padrão, a aplicação usa `127.0.0.1` e a porta `5000`. Acesse `http://127.0.0.1:5000` no navegador.
@@ -168,10 +170,10 @@ Por padrão, a aplicação usa `127.0.0.1` e a porta `5000`. Acesse `http://127.
 Para reproduzir o exercício histórico a partir do Kali, o servidor precisa escutar no endereço atual do adaptador Host-Only do Windows. No exemplo abaixo, `192.168.219.1` é o IP registrado no exercício antigo — confirme o valor com `ipconfig` antes de usar:
 
 ```bat
-python app.py --host 192.168.219.1 --port 5000
+python vulnerable/app.py --host 192.168.219.1 --port 5000
 ```
 
-O ponto de entrada `python app.py` recusa `0.0.0.0`. Não contorne essa proteção nem publique a aplicação vulnerável em uma interface pública. Encerre o servidor com <kbd>Ctrl</kbd> + <kbd>C</kbd> ao terminar.
+O ponto de entrada `python vulnerable/app.py` recusa `0.0.0.0`. Não contorne essa proteção nem publique a aplicação vulnerável em uma interface pública. Encerre o servidor com <kbd>Ctrl</kbd> + <kbd>C</kbd> ao terminar.
 
 ## Uso da aplicação Flask
 
@@ -339,33 +341,34 @@ Esses comandos consultam o serviço e não substituem a análise do resultado. A
 
 ```text
 cyber.vulnerable-login-lab/
-├── .gitignore                         # Ignora ambientes, caches, logs e listas temporárias
-├── README.md                          # Visão geral e reprodução
-├── app.py                             # Aplicação Flask deliberadamente vulnerável
-├── requirements.txt                   # Flask e pytest
-├── diario-do-laboratorio.md           # Histórico do exercício web
-├── guia-de-reproducao.md              # Guia histórico de reprodução web
-├── seguranca-e-limitacoes.md          # Riscos conhecidos e recomendações
-├── static/
-│   └── style.css                      # Estilos da aplicação Flask
-├── templates/
-│   └── login.html                     # Formulário HTML
-├── tests/
-│   └── test_app.py                    # Testes da aplicação vulnerável
-├── wordlists/
-│   ├── usernames.txt                 # Lista curta de demonstração
-│   └── passwords.txt                 # Lista curta de demonstração
-├── images/
-│   ├── desenvolvimento/              # Evidência da linha de base
-│   ├── web/                          # Capturas do formulário Flask e do teste Medusa
-│   ├── ftp/                          # Capturas da Atividade 1
-│   └── smb/                          # Capturas da Atividade 3
-└── docs/
-    └── assets/
-        └── banner.svg                 # Banner editorial do README
+├── README.md                         # Visão geral e comandos para as duas versões
+├── .gitignore                        # Regras comuns para ambiente, caches e logs
+├── vulnerable/                       # Linha de base vulnerável preservada
+│   ├── README.md                     # Escopo e execução da versão vulnerável
+│   ├── app.py                        # Backend Flask original do laboratório
+│   ├── requirements.txt              # Dependências da versão vulnerável
+│   ├── templates/login.html          # Interface do login
+│   ├── static/style.css              # Efeitos visuais da interface
+│   └── tests/test_app.py             # Cinco testes da linha de base
+├── hardened/                         # Esqueleto para a futura versão defensiva
+│   ├── README.md                     # Estado real e critérios planejados
+│   ├── requirements.txt              # Dependências iniciais, ainda mínimas
+│   ├── templates/login.html          # Base visual para preservar consistência
+│   └── static/style.css              # Mesma direção visual da versão vulnerável
+├── docs/
+│   ├── assets/banner.svg             # Banner local do README
+│   ├── diario-do-laboratorio.md      # Histórico da atividade web
+│   ├── guia-de-reproducao.md         # Procedimento de laboratório atualizado
+│   └── seguranca-e-limitacoes.md     # Limitações e controles recomendados
+├── images/                           # Evidências reais dos exercícios
+│   ├── desenvolvimento/
+│   ├── web/
+│   ├── ftp/
+│   └── smb/
+└── wordlists/                        # Listas curtas didáticas versionadas
 ```
 
-As listas públicas em `wordlists/` são artefatos didáticos versionados. Listas temporárias criadas para execuções locais devem permanecer fora do Git. O `.gitignore` contém regras para nomes de listas temporárias usados durante os exercícios.
+`hardened/` é um ponto de partida visual, não uma aplicação pronta. Não a execute nem a descreva como protegida até que o backend e os testes defensivos sejam implementados.
 
 ## Testes
 
@@ -409,9 +412,9 @@ Para aplicações reais, considere hashing de senhas com uma biblioteca apropria
 
 ## Documentação complementar
 
-- [Diário do laboratório](diario-do-laboratorio.md) — problemas encontrados, hipóteses e correções durante o exercício Flask.
-- [Guia de reprodução](guia-de-reproducao.md) — etapas históricas de configuração e teste web; confira os comandos antes de executá-los, pois algumas anotações antigas podem não corresponder ao código atual.
-- [Segurança e limitações](seguranca-e-limitacoes.md) — fraquezas intencionais, riscos e controles recomendados.
+- [Diário do laboratório](docs/diario-do-laboratorio.md) — problemas encontrados, hipóteses e correções durante o exercício Flask.
+- [Guia de reprodução](docs/guia-de-reproducao.md) — etapas históricas de configuração e teste web; confira os comandos antes de executá-los, pois algumas anotações antigas podem não corresponder ao código atual.
+- [Segurança e limitações](docs/seguranca-e-limitacoes.md) — fraquezas intencionais, riscos e controles recomendados.
 
 ## Contribuição e licença
 
