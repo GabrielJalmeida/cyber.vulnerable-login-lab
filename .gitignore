@@ -22,3 +22,12 @@ htmlcov/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Wordlists temporárias e saídas locais do laboratório
+/users.txt
+/pass.txt
+/passwords.txt
+/usernames.txt
+/smb_users.txt
+/senhas*.txt
+/enum4_output*
