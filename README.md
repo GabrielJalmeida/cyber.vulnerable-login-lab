@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/banner.svg" alt="Cyber Lab — Vulnerable Login Lab: autenticação sob investigação" width="100%">
+<img src="docs/assets/banner.jpg" alt="Cyber Lab — Vulnerable Login Lab: autenticação sob investigação" width="100%">
 
 # Cyber Lab — Vulnerable Login Lab
 
