@@ -4,139 +4,112 @@
 
 # Cyber Lab — Vulnerable Login Lab
 
-**Um laboratório educacional para observar autenticação web, FTP e SMB em ambientes isolados.**
+**Laboratório educacional de autenticação web, análise de evidências e controles defensivos.**
 
 ![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Flask](https://img.shields.io/badge/Flask-3.0.3-222222?style=for-the-badge&logo=flask&logoColor=white)
-![Pytest](https://img.shields.io/badge/Pytest-8.3.3-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-3.0.3%20%2F%203.1.3-222222?style=for-the-badge&logo=flask&logoColor=white)
+![Pytest](https://img.shields.io/badge/Pytest-8.3.3%20%2F%209.1.1-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)
 ![Kali Linux](https://img.shields.io/badge/Kali_Linux-Lab-557C94?style=for-the-badge&logo=kalilinux&logoColor=white)
-![Status](https://img.shields.io/badge/status-em%20desenvolvimento-B42318?style=for-the-badge)
+![Status](https://img.shields.io/badge/status-laborat%C3%B3rio%20educacional-17663A?style=for-the-badge)
 
-[Sobre](#sobre-o-projeto) · [Demonstração](#demonstração) · [Tecnologias](#tecnologias) · [Começando](#começando) · [Atividades](#atividades-do-laboratório) · [Testes](#testes) · [Roadmap](#roadmap)
+[Visão geral](#visão-geral) · [Demonstração](#demonstração) · [Começar](#começar) · [Versões](#as-duas-versões) · [Evidências](#atividades-e-evidências) · [Testes](#testes) · [Limitações](#segurança-e-limitações)
 
 </div>
 
 > [!CAUTION]
-> **Uso exclusivamente educacional e autorizado.** A aplicação Flask deste repositório é intencionalmente vulnerável. Execute-a e realize testes de autenticação apenas em máquinas próprias ou ambientes para os quais você tenha autorização explícita. Não exponha serviços vulneráveis à Internet, não use credenciais pessoais ou reutilizadas e não teste sistemas de terceiros.
+> **Uso exclusivamente educacional e autorizado.** A pasta `vulnerable/` contém uma aplicação intencionalmente vulnerável e não deve ser exposta à Internet. Execute testes ativos somente em máquinas próprias ou alvos com autorização explícita. Use contas e listas sintéticas; nunca reutilize credenciais pessoais, acadêmicas ou profissionais.
 
 > [!NOTE]
-> Este é um projeto acadêmico independente desenvolvido por Gabriel Almeida no contexto dos estudos de cibersegurança e de uma atividade da DIO. **Não é uma aplicação oficial da DIO, não possui integração com a plataforma e não representa endosso ou afiliação.**
+> Projeto acadêmico independente de Gabriel Almeida, desenvolvido no contexto de estudos de cibersegurança e de uma atividade da DIO. **Não é um sistema oficial da DIO, não possui integração com a plataforma e não representa endosso ou afiliação.**
 
 ## Sumário
 
-- [Sobre o projeto](#sobre-o-projeto)
+- [Visão geral](#visão-geral)
 - [Demonstração](#demonstração)
-- [Escopo e estado dos cenários](#escopo-e-estado-dos-cenários)
+- [As duas versões](#as-duas-versões)
 - [Tecnologias](#tecnologias)
-- [Arquitetura do laboratório](#arquitetura-do-laboratório)
-- [Começando](#começando)
-- [Uso da aplicação Flask](#uso-da-aplicação-flask)
-- [Atividades do laboratório](#atividades-do-laboratório)
-- [Estrutura do projeto](#estrutura-do-projeto)
+- [Começar](#começar)
+- [Atividades e evidências](#atividades-e-evidências)
+- [Arquitetura e ambiente](#arquitetura-e-ambiente)
 - [Testes](#testes)
+- [Estrutura do projeto](#estrutura-do-projeto)
 - [Segurança e limitações](#segurança-e-limitações)
-- [Roadmap](#roadmap)
 - [Documentação complementar](#documentação-complementar)
-- [Contribuição e licença](#contribuição-e-licença)
-- [Autor](#autor)
+- [Roadmap](#roadmap)
+- [Licença e autor](#licença-e-autor)
 
 ---
 
-## Sobre o projeto
+## Visão geral
 
-O **Cyber Lab — Vulnerable Login Lab** reúne exercícios para compreender como sistemas de autenticação respondem a tentativas de login, como ferramentas de auditoria interagem com serviços de laboratório e como documentar resultados de forma reproduzível.
+O **Cyber Lab — Vulnerable Login Lab** reúne exercícios para compreender respostas de autenticação, tentativas repetidas de login, análise de requisições HTTP e documentação de resultados reproduzíveis. Também registra exercícios de conectividade e autenticação em serviços FTP e SMB de um ambiente virtual autorizado.
 
-A parte web utiliza uma aplicação própria em Flask, criada para observar o fluxo entre formulário HTML, requisição HTTP, validação no servidor e logs locais. Para os cenários de serviço, o laboratório registra verificações de conectividade e autenticação nos serviços FTP e SMB de um alvo virtual autorizado.
+O cenário web foi adaptado para uma aplicação Flask própria porque o DVWA não funcionou no ambiente utilizado. Portanto, os registros web deste projeto são de um **formulário Flask autoral**, não de uma execução do DVWA.
 
-O desafio da DIO permite adaptar o ambiente à realidade do estudante. Como o DVWA não chegou a funcionar como alvo no ambiente disponível, o cenário web foi adaptado para um formulário Flask próprio. Esta documentação registra essa adaptação e não afirma que o exercício web foi realizado no DVWA.
-
-O objetivo não é criar um sistema de autenticação de produção. É tornar visíveis as limitações de uma implementação vulnerável, praticar a leitura de evidências e comparar essa linha de base com uma versão reforçada.
-
-Para manter a comparação rastreável, a implementação original está em `vulnerable/`. A pasta `hardened/` contém apenas a estrutura inicial e a mesma camada visual: **a implementação defensiva ainda não existe e não deve ser considerada segura nem executável**. As duas versões terão código e testes separados.
+O repositório mantém duas aplicações separadas: uma linha de base didática vulnerável e uma versão `hardened` com controles defensivos testáveis. Elas têm dependências, configurações e testes independentes.
 
 ## Demonstração
 
-As capturas abaixo foram produzidas durante os exercícios no ambiente local. Elas documentam a interface web, a requisição HTTP observada no navegador, o resultado do teste controlado e os exercícios FTP/SMB; não representam uma demonstração online.
+As imagens abaixo são capturas históricas dos exercícios realizados localmente; não são demonstrações online nem capturas da nova interface `hardened`.
 
 <p align="center">
-  <img src="images/web/01-tela-login.png" alt="Tela de login do laboratório Flask com fundo grafite e borda neon multicolorida" width="32%">
-  <img src="images/web/04-resultado-medusa.png" alt="Terminal do Kali com o resultado registrado do teste Medusa contra o formulário de laboratório" width="32%">
-  <img src="images/web/06-validacao-login-sucesso.png" alt="Formulário Flask mostrando a confirmação textual de login de demonstração bem-sucedido" width="32%">
+  <img src="images/web/01-tela-login.png" alt="Interface histórica da aplicação Flask vulnerável usada no laboratório" width="32%">
+  <img src="images/web/04-resultado-medusa.png" alt="Captura histórica do resultado do teste controlado com Medusa" width="32%">
+  <img src="images/web/06-validacao-login-sucesso.png" alt="Validação histórica do login demonstrativo na aplicação Flask" width="32%">
 </p>
 
-**Galerias de evidências:** [Web — Flask e Medusa](images/web/) · [FTP](images/ftp/) · [SMB](images/smb/) · [Preparação e linha de base](images/desenvolvimento/)
+**Galerias de evidências:** [Web — Flask e Medusa](images/web/) · [FTP](images/ftp/) · [SMB](images/smb/) · [Desenvolvimento e linha de base](images/desenvolvimento/)
 
-## Escopo e estado dos cenários
+## As duas versões
 
-| Cenário | O que foi feito | Estado registrado | Evidências |
-|---|---|---|---|
-| Web — Flask autoral | Inspeção pelo DevTools, verificação da resposta de falha, teste controlado com Medusa e validação final no formulário | Exercício realizado no ambiente local; seis capturas registram a interface, conectividade, requisição, execução do Medusa e validação do login | [Evidências web](images/web/) |
-| Atividade 1 — FTP | Verificação de conectividade, identificação da porta 21, teste com Medusa e nova conexão FTP para validar a autenticação | O Nmap identificou `21/tcp open ftp vsftpd 2.3.4`; o resultado do Medusa e a conexão FTP posterior foram registrados nas capturas | [Evidências FTP](images/ftp/) |
-| Atividade 3 — SMB | Verificação das portas 139/445, enumeração com `enum4linux`, teste com Medusa e validação posterior com `smbclient` | A execução e a validação foram relatadas e registradas nas capturas | [Evidências SMB](images/smb/) |
-| Versão `hardened` | Estrutura inicial com HTML/CSS compartilhando a direção visual | Esqueleto criado; ainda sem backend, controles defensivos ou testes próprios | [Estado da estrutura](hardened/README.md) |
+| Versão | Objetivo | Estado e comportamento |
+|---|---|---|
+| [`vulnerable/`](vulnerable/) | Linha de base para exercícios autorizados de autenticação | Flask 3.0.3; não limita tentativas. Mantém os marcadores didáticos `LOGIN_OK`/`LOGIN_FAILED` e usa HTTP `200` para ambos os resultados. **Não é segura e não deve ser exposta à Internet.** |
+| [`hardened/`](hardened/) | Comparar uma implementação com controles defensivos | Flask 3.1.3; Argon2id, CSRF, sessão temporária, headers defensivos, limites de entrada e rate limiting em memória. Interface tech/gamer neon com formulário em formato de cadeado. |
 
-Os estados acima descrevem os registros disponíveis. A atualização deste README não significa que todos os testes de rede tenham sido repetidos durante a escrita da documentação. Consulte as capturas para conhecer o resultado efetivamente registrado em cada etapa.
+### Controles implementados em `hardened/`
+
+- **Senhas:** hash Argon2id (`m=19456 KiB`, `t=2`, `p=1`) por `argon2-cffi`.
+- **Tentativas repetidas:** até cinco submissões por IP em uma janela de 60 segundos; a partir da sexta tentativa, a aplicação retorna `429` e bloqueia por 60 segundos.
+- **Formulários:** proteção CSRF no login e logout.
+- **Sessão:** cookie assinado, `HttpOnly`, `SameSite=Lax` e expiração de 15 minutos. `Secure` fica desativado para o laboratório local em HTTP.
+- **Respostas e navegador:** tratamento controlado de configuração inválida, headers defensivos, limite de tamanho de requisição/campos e `Cache-Control: no-store`.
+- **Configuração:** `setup_lab.py` gera o hash e uma chave de sessão aleatória, gravando a configuração local em `.env`.
+
+Esses controles reduzem riscos nos cenários cobertos, mas **não tornam a aplicação invulnerável nem pronta para produção**. Consulte [`hardened/README.md`](hardened/README.md) para política, execução e limitações.
 
 ## Tecnologias
 
 <p align="center">
-  <img src="https://skillicons.dev/icons?i=python,flask,linux,git&perline=4" alt="Tecnologias: Python, Flask, Linux e Git">
+  <img src="https://skillicons.dev/icons?i=python,flask,linux,git&perline=4" alt="Python, Flask, Linux e Git">
 </p>
 
-| Tecnologia ou ferramenta | Papel no projeto |
+| Tecnologia/ferramenta | Uso |
 |---|---|
-| **Python** | Linguagem da aplicação Flask e dos testes automatizados |
-| **Flask 3.0.3** | Servidor web e rotas do formulário demonstrativo |
-| **Jinja2, HTML e CSS** | Formulário e apresentação da aplicação web |
-| **pytest 8.3.3** | Testes automatizados da versão vulnerável |
-| **Kali Linux** | Ambiente de laboratório para as ferramentas de teste |
-| **Medusa** | Testes controlados de autenticação nos alvos autorizados |
-| **Nmap** | Identificação de portas e serviços acessíveis |
-| **enum4linux e smbclient** | Consulta e validação no cenário SMB |
-| **Oracle VirtualBox** | Execução das máquinas virtuais e configuração de rede isolada |
-| **Git e GitHub** | Versionamento, documentação e compartilhamento do projeto |
+| Python, Flask, Jinja2, HTML e CSS | Aplicações web e interfaces do laboratório |
+| pytest | Testes automatizados separados por versão |
+| Flask-WTF | Proteção CSRF na versão `hardened` |
+| argon2-cffi | Hash de senha Argon2id na versão `hardened` |
+| python-dotenv | Leitura de configuração local por `.env` na versão `hardened` |
+| Kali Linux e Medusa | Exercícios controlados de autenticação em alvos próprios/autorizados |
+| Nmap | Identificação de portas e serviços no ambiente isolado |
+| enum4linux e smbclient | Consulta e validação no cenário SMB |
+| Oracle VirtualBox | Máquinas virtuais e redes isoladas de laboratório |
+| Git e GitHub | Versionamento e documentação |
 
-As dependências Python declaradas no repositório são Flask e pytest. As ferramentas de rede são instaladas e executadas na VM Kali e podem variar conforme a versão da distribuição.
+As dependências Python são separadas: `vulnerable/requirements.txt` atende à linha de base; `hardened/requirements.txt` atende à implementação com controles defensivos.
 
-## Arquitetura do laboratório
-
-Os exercícios web e FTP/SMB foram realizados em configurações de rede diferentes. **Não misture os endereços históricos nem presuma que todos os adaptadores estão ativos simultaneamente.** Confirme os IPs atuais antes de reproduzir cada cenário.
-
-### Cenário web histórico
-
-```mermaid
-flowchart LR
-    K[Kali Linux<br/>192.168.219.10] -->|HTTP em rede Host-Only| W[Windows<br/>192.168.219.1:5000]
-    W --> F[Flask<br/>POST /login]
-    F --> L[Log local<br/>sem senha submetida]
-```
-
-O diagrama representa os endereços registrados no exercício web anterior. Substitua-os pelos valores atuais caso a rede virtual tenha mudado.
-
-### Cenários FTP e SMB registrados
-
-```mermaid
-flowchart LR
-    K[Kali Linux<br/>192.168.56.102] -->|Rede de laboratório| T[Alvo virtual<br/>192.168.56.101]
-    T --> FTP[FTP<br/>TCP 21<br/>vsftpd 2.3.4 identificado]
-    T --> SMB[SMB<br/>TCP 139 e 445 abertos]
-    K -->|Validação do serviço| C[smbclient]
-```
-
-O endereço `192.168.56.101` foi o alvo utilizado nos registros dos exercícios. A identidade exata da VM que executava esses serviços deve ser conferida no ambiente atual. **Metasploitable 2 é um sistema convidado deliberadamente vulnerável; não é sinônimo do Ubuntu Server que possa hospedar ou executar a máquina virtual.**
-
-## Começando
+## Começar
 
 ### Pré-requisitos
 
-- Windows com Python e `pip` para executar o cenário Flask.
-- Oracle VirtualBox e Kali Linux para reproduzir os exercícios de rede.
-- Medusa, Nmap e, para o cenário SMB, `enum4linux` e `smbclient` disponíveis no Kali.
-- Uma rede Host-Only ou Internal Network configurada para o laboratório.
-- Máquinas-alvo próprias ou autorização explícita para os testes.
+- Python 3.10 ou superior (a versão efetivamente instalada e as dependências resolvidas podem variar por ambiente).
+- Windows, CMD/PowerShell ou terminal compatível.
+- Para reproduzir os exercícios de rede: VirtualBox, Kali Linux, ferramentas necessárias e uma rede Host-Only/Internal Network devidamente configurada.
+- Máquinas próprias e autorização explícita para qualquer teste ativo.
 
 > [!IMPORTANT]
-> Os cenários de rede devem permanecer isolados. Não use adaptadores Bridged para expor deliberadamente serviços vulneráveis e confirme IP, serviço e alvo antes de qualquer teste ativo.
+> Os endereços IP documentados nas evidências são históricos, não configurações atuais garantidas. Antes de executar exercícios de rede, confirme a identidade do alvo, o endereço, a porta, os adaptadores virtuais e o escopo. Não use Bridged Adapter para expor deliberadamente serviços vulneráveis.
 
 ### 1. Clonar o repositório
 
@@ -145,285 +118,169 @@ git clone https://github.com/GabrielJalmeida/cyber.vulnerable-login-lab.git
 cd cyber.vulnerable-login-lab
 ```
 
-### 2. Preparar o ambiente Python no Windows
+### 2. Executar a versão `hardened` (recomendada para a demonstração final)
 
-Abra o CMD na pasta do projeto:
+No Windows, no CMD ou PowerShell:
+
+```bat
+cd hardened
+py -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+.venv\Scripts\python.exe setup_lab.py
+.venv\Scripts\python.exe -m pytest -q
+.venv\Scripts\python.exe run.py
+```
+
+O assistente `setup_lab.py` solicitará um nome de usuário de demonstração e uma senha exclusiva do laboratório, pedirá confirmação e gerará um hash Argon2id e uma chave de sessão aleatória em `.env`. A senha em texto claro não é gravada. O script não sobrescreve um `.env` existente.
+
+Abra `http://127.0.0.1:5001`. O servidor faz bind somente em `127.0.0.1`, com `debug=False`. Não publique nem exponha essa aplicação à Internet como se fosse um sistema de autenticação pronto para produção.
+
+**Proteja o arquivo `hardened/.env`: nunca o versione nem compartilhe.** O modelo seguro de configuração é [`hardened/.env.example`](hardened/.env.example); seus placeholders não são credenciais utilizáveis.
+
+### 3. Executar a versão `vulnerable` (somente para o exercício isolado)
+
+A partir da raiz do repositório, crie um ambiente separado e instale apenas as dependências desta versão:
 
 ```bat
 py -m venv venv
-venv\Scripts\activate
-python -m pip install -r vulnerable/requirements.txt
+venv\Scripts\python.exe -m pip install -r vulnerable\requirements.txt
+venv\Scripts\python.exe -m pytest -q vulnerable\tests
+venv\Scripts\python.exe vulnerable\app.py
 ```
 
-O arquivo `vulnerable/requirements.txt` fixa as versões Flask `3.0.3` e pytest `8.3.3`.
+Por padrão, a aplicação usa `127.0.0.1:5000`. Acesse `http://127.0.0.1:5000`. O cenário web histórico a partir do Kali usou uma rede Host-Only; caso reproduza esse exercício, confirme o IP privado atual e consulte [`vulnerable/README.md`](vulnerable/README.md). Não use `0.0.0.0` ou uma interface pública.
 
-### 3. Executar a aplicação localmente
+A versão `vulnerable` não tem rate limiting e retorna HTTP `200` tanto para sucesso quanto para falha, distinguindo os resultados pelo corpo da resposta. Isso faz parte da demonstração didática, não é uma recomendação para aplicações reais.
 
-Para manter o serviço acessível somente no próprio Windows, execute:
+## Atividades e evidências
+
+Os exercícios foram registrados nas capturas existentes nas pastas `images/`. A tabela resume o escopo e não afirma que os testes de rede foram repetidos durante a última atualização da documentação.
+
+| Cenário | Atividade registrada | Evidências |
+|---|---|---|
+| Web — Flask autoral | Inspeção no DevTools, requisição `POST /login`, teste controlado com Medusa e validação pelo formulário. O DVWA não foi executado neste ambiente. | [Galeria web](images/web/) |
+| Atividade 1 — FTP | Conectividade, identificação de `21/tcp`, teste com Medusa e validação posterior de autenticação no serviço FTP. | [Galeria FTP](images/ftp/) |
+| Atividade 3 — SMB | Portas 139/445, enumeração com `enum4linux`, teste controlado e validação com `smbclient`. | [Galeria SMB](images/smb/) |
+| Versão hardened | Autenticação local com controles de segurança, testes automatizados e interface neon de cadeado. | [Código e testes](hardened/) |
+
+As capturas representam somente o resultado visível no momento em que foram produzidas. Uma autenticação bem-sucedida em FTP/SMB demonstra acesso ao serviço com a conta testada; não prova, por si só, execução de shell ou controle administrativo do sistema operacional. O uso das opções `-U` e `-P` não comprova password spraying sem examinar a ordem efetiva das tentativas.
+
+Para procedimentos complementares, consulte [`docs/guia-de-reproducao.md`](docs/guia-de-reproducao.md) e [`docs/diario-do-laboratorio.md`](docs/diario-do-laboratorio.md). Confira as instruções e os endereços antes de reproduzir registros históricos.
+
+## Arquitetura e ambiente
+
+Os cenários web, FTP e SMB foram conduzidos em redes virtuais distintas. Não presuma que os endereços históricos estão ativos simultaneamente:
+
+```mermaid
+flowchart LR
+    Kali[Kali Linux] -->|HTTP local/Host-Only| Web[Flask: vulnerable ou hardened]
+    Web --> Auth[Verificação de autenticação]
+    Auth --> Logs[Eventos locais sem senha submetida]
+    Kali -->|Somente alvo autorizado| FTP[Serviço FTP de laboratório]
+    Kali -->|Somente alvo autorizado| SMB[Serviço SMB de laboratório]
+```
+
+Os endereços registrados anteriormente incluíram `192.168.219.1`/`192.168.219.10` no cenário web e `192.168.56.101`/`192.168.56.102` nos cenários FTP/SMB. Esses valores são referências históricas; valide IPs, serviços e adaptadores na configuração atual antes de usar qualquer comando. A identificação de `vsftpd 2.3.4` pelo banner, isoladamente, não comprova que o binário contém a backdoor associada à CVE-2011-2523; veja a [referência NVD](https://nvd.nist.gov/vuln/detail/CVE-2011-2523).
+
+## Testes
+
+Execute as suítes separadamente para evitar misturar dependências e objetivos das duas aplicações.
+
+**Linha de base vulnerável** — a suíte existente cobre carregamento da página, credenciais válidas/inválidas, usuário inválido e campos ausentes:
 
 ```bat
-python vulnerable/app.py
+venv\Scripts\python.exe -m pytest -q vulnerable\tests
 ```
 
-Por padrão, a aplicação usa `127.0.0.1` e a porta `5000`. Acesse `http://127.0.0.1:5000` no navegador.
-
-Para reproduzir o exercício histórico a partir do Kali, o servidor precisa escutar no endereço atual do adaptador Host-Only do Windows. No exemplo abaixo, `192.168.219.1` é o IP registrado no exercício antigo — confirme o valor com `ipconfig` antes de usar:
+**Versão hardened** — dentro de `hardened/`, com suas dependências instaladas:
 
 ```bat
-python vulnerable/app.py --host 192.168.219.1 --port 5000
+.venv\Scripts\python.exe -m pytest -q
 ```
 
-O ponto de entrada `python vulnerable/app.py` recusa `0.0.0.0`. Não contorne essa proteção nem publique a aplicação vulnerável em uma interface pública. Encerre o servidor com <kbd>Ctrl</kbd> + <kbd>C</kbd> ao terminar.
+**Últimos resultados locais informados durante o desenvolvimento (26/10/2026):** a suíte `hardened` passou com `15 passed in 0.65s` no Windows usando Python 3.14.6. A linha de base `vulnerable` teve uma execução registrada anteriormente com cinco testes passando. Esses são registros de execução local, não resultados de CI nem garantia para todos os sistemas.
 
-## Uso da aplicação Flask
-
-### Fluxo HTTP
-
-- `GET /` apresenta o formulário de login.
-- `POST /login` recebe os campos `username` e `password`.
-- A aplicação devolve o marcador `LOGIN_OK` quando a credencial demonstrativa é aceita e `LOGIN_FAILED` quando é rejeitada.
-- Na implementação didática, os dois caminhos usam HTTP `200`; a distinção é feita pelo corpo da resposta para facilitar o exercício com o módulo web do Medusa. Isso não é uma recomendação para sistemas de produção.
-- O log local `login_attempts.log` registra horário, usuário enviado e resultado, mas não deve registrar a senha submetida. O `.gitignore` exclui arquivos `*.log`.
-
-A conta demonstrativa está definida no código e é exclusiva do laboratório. Nunca reutilize essa credencial em serviços reais.
-
-### Inspecionar uma requisição manual
-
-Com o Flask em execução no próprio Windows, envie uma requisição de teste para o endereço local:
-
-```bash
-curl -i -X POST --data-urlencode 'username=aluno' --data-urlencode 'password=Lab123!' http://127.0.0.1:5000/login
-```
-
-Para testar a partir do Kali, substitua o endereço local pelo IP Host-Only do Windows confirmado no ambiente. Use apenas a credencial fictícia definida no código do laboratório.
-
-### Observar a requisição no navegador
-
-1. Abra a página de login.
-2. Pressione <kbd>F12</kbd> e selecione **Network / Rede**.
-3. Envie uma tentativa de login.
-4. Inspecione a requisição `POST /login`, os campos do formulário, o status HTTP e o marcador de resposta.
-
-<details>
-<summary><strong>Ver reprodução histórica do teste web com Medusa</strong></summary>
-
-O procedimento a seguir descreve o exercício histórico contra o formulário Flask autoral, não contra a plataforma DIO ou qualquer serviço público. Execute somente no laboratório autorizado.
-
-Primeiro, consulte as opções do módulo instalado no Kali:
-
-```bash
-medusa -M web-form -q
-```
-
-As wordlists públicas do projeto ficam em `wordlists/usernames.txt` e `wordlists/passwords.txt`. Elas são listas curtas de demonstração. O teste histórico usou o endereço Host-Only registrado para o Windows; confirme o IP atual antes da reprodução:
-
-```bash
-medusa -h 192.168.219.1 -n 5000 -U wordlists/usernames.txt -P wordlists/passwords.txt -M web-form -m FORM:login -m 'FORM-DATA:POST?username=&password=' -m 'DENY-SIGNAL:LOGIN_FAILED' -t 1
-```
-
-Esse comando é um exemplo histórico para o alvo Flask local. A sintaxe e as opções podem variar com a versão instalada; confira a ajuda local do Medusa antes de usar. Não direcione o comando a sites, contas, serviços da faculdade, empresas ou sistemas de terceiros.
-
-O resultado documentado anteriormente indicou a credencial demonstrativa, e o log Flask registrou uma requisição originada do Kali. O exercício não comprova comprometimento do Windows, do Kali ou de outro serviço.
-
-</details>
-
-## Atividades do laboratório
-
-### Cenário web — formulário Flask e Medusa
-
-O cenário web foi realizado contra a aplicação Flask própria, hospedada no Windows e acessada a partir do Kali pela rede Host-Only do laboratório. O exercício incluiu a análise do formulário no navegador, a observação da requisição HTTP, a tentativa controlada com o Medusa e a confirmação final no formulário.
-
-**Resultado e interpretação:**
-
-- O navegador enviou uma requisição `POST` para `/login`.
-- A tentativa com credenciais incorretas devolveu o marcador `LOGIN_FAILED` com HTTP `200`. O status `200`, isoladamente, não demonstra autenticação bem-sucedida; o conteúdo da resposta indicou a falha lógica esperada.
-- A execução do Medusa reportou a credencial demonstrativa do laboratório como encontrada.
-- Uma submissão posterior no próprio formulário retornou `LOGIN_OK`, confirmando o resultado no alvo web.
-- O exercício demonstra a fragilidade de um login sem limitação de tentativas; não demonstra comprometimento do Windows nem acesso a outros serviços.
-
-| Evidência | O que documenta |
-|---|---|
-| [01 — Tela de login](images/web/01-tela-login.png) | Aparência da aplicação antes dos testes |
-| [02 — Conectividade Kali](images/web/02-conectividade-kali.png) | Verificação da comunicação e acesso HTTP ao alvo |
-| [03 — Análise no F12](images/web/03-analise-requisicao-f12.png) | Método `POST`, status HTTP e resposta `LOGIN_FAILED` observados no navegador |
-| [04 — Resultado Medusa](images/web/04-resultado-medusa.png) | Registro da execução do teste controlado |
-| [05 — Credencial encontrada](images/web/05-login-encontrado.png) | Saída que identifica a credencial fictícia do laboratório |
-| [06 — Login confirmado](images/web/06-validacao-login-sucesso.png) | Confirmação visual de `LOGIN_OK` no formulário |
-
-As capturas representam o que foi registrado durante a sessão do exercício. Endereços IP privados mostrados nas imagens pertencem à configuração de laboratório usada naquele momento; confirme os endereços atuais antes de repetir o cenário.
-
-### Atividade 1 — FTP com Kali Linux e Medusa
-
-**Procedimento registrado:**
-
-1. Confirmar os endereços atuais e a conectividade entre o Kali e o alvo autorizado.
-2. Verificar a porta TCP 21 com Nmap.
-3. Conectar ao serviço FTP e confirmar que ele responde.
-4. Usar listas pequenas e fictícias exclusivas do laboratório.
-5. Conferir a ajuda da versão local do Medusa antes do teste controlado.
-6. Validar o resultado conectando-se novamente ao serviço FTP.
-7. Encerrar a sessão com `quit` e revisar as capturas.
-
-**Resultados registrados:**
-
-- Kali: `192.168.56.102`.
-- Alvo de laboratório: `192.168.56.101`.
-- O `ping` recebeu respostas.
-- O Nmap identificou `21/tcp open ftp vsftpd 2.3.4`.
-- O resultado do Medusa e a conexão FTP posterior foram registrados nas capturas da atividade.
-
-A autenticação bem-sucedida comprova acesso ao **serviço FTP com a conta testada**. Não comprova, por si só, acesso a um shell, terminal ou controle administrativo do sistema operacional.
-
-| Evidência | O que documenta |
-|---|---|
-| [01 — Conectividade e Nmap](images/ftp/01-conectividade-e-nmap.png) | Conectividade e identificação do serviço FTP |
-| [02 — Medusa](images/ftp/02-medusa-conectando.png) | Execução e resultado registrado do teste com Medusa |
-| [03 — FTP conectado](images/ftp/03-ftp-conectado.png) | Validação posterior da autenticação FTP |
-
-### Atividade 3 — SMB, enumeração e validação com `smbclient`
-
-**Procedimento registrado:**
-
-1. Confirmar o alvo autorizado e verificar as portas TCP 139 e 445.
-2. Executar `enum4linux` para consultar informações SMB disponíveis conforme a configuração do serviço.
-3. Preparar listas pequenas de usuários e senhas fictícios.
-4. Conferir a ajuda local do Medusa e usar o módulo SMB compatível com a versão instalada.
-5. Registrar o resultado observado e classificar a técnica conforme a ordem real das tentativas. O uso de `-U` e `-P`, isoladamente, não comprova password spraying.
-6. Usar `smbclient` para validar a autenticação e/ou consultar os compartilhamentos permitidos pela conta testada.
-7. Revisar e sanitizar as capturas.
-
-**Resultados registrados:**
-
-- Kali: `192.168.56.102`.
-- Alvo de laboratório: `192.168.56.101`.
-- O Nmap indicou as portas TCP 139 e 445 abertas.
-- A enumeração com `enum4linux`, o teste controlado com Medusa e a validação posterior com `smbclient` foram registrados nas evidências da atividade.
-
-Uma resposta positiva do `smbclient` pode confirmar autenticação ou listagem de compartilhamentos no contexto testado. Isso, por si só, **não significa que foi aberta uma sessão de terminal no sistema inteiro**. A conclusão deve corresponder exatamente ao que aparece na captura.
-
-| Evidência | O que documenta |
-|---|---|
-| [01 — Nmap SMB](images/smb/01-nmap-smb.png) | Identificação das portas SMB |
-| [02 — Preparação das listas](images/smb/02-criando-textos.png) | Preparação dos arquivos de texto usados no exercício |
-| [03 — Medusa](images/smb/03-medusa-conectado.png) | Execução e resultado registrado do teste com Medusa |
-| [04 — Validação com smbclient](images/smb/04-validacao-smbclient.png) | Validação posterior no serviço SMB |
-
-<details>
-<summary><strong>Comandos de consulta usados nos cenários FTP e SMB</strong></summary>
-
-Use os endereços atuais confirmados do laboratório; `192.168.56.101` é o endereço histórico registrado neste exercício.
-
-Verificar FTP:
-
-```bash
-nmap -Pn -sV -p 21 192.168.56.101
-ftp 192.168.56.101
-```
-
-Verificar SMB:
-
-```bash
-nmap -Pn -sV -p 139,445 192.168.56.101
-enum4linux -a 192.168.56.101
-```
-
-Consultar compartilhamentos SMB com uma conta fictícia autorizada:
-
-```bash
-smbclient -L //192.168.56.101 -U USUARIO_DE_TESTE
-```
-
-Esses comandos consultam o serviço e não substituem a análise do resultado. Antes de executar qualquer tentativa de credenciais, confirme o escopo, a versão da ferramenta, o alvo e o uso exclusivo de contas/listas sintéticas.
-
-</details>
+A suíte `hardened` inclui cenários para autenticação, configuração/hash inválido, CSRF, sessão, rate limiting, recuperação e headers. O teste do rate limit usa relógio controlado para não depender de espera real de 60 segundos.
 
 ## Estrutura do projeto
 
 ```text
 cyber.vulnerable-login-lab/
-├── README.md                         # Visão geral e comandos para as duas versões
-├── .gitignore                        # Regras comuns para ambiente, caches e logs
-├── vulnerable/                       # Linha de base vulnerável preservada
-│   ├── README.md                     # Escopo e execução da versão vulnerável
-│   ├── app.py                        # Backend Flask original do laboratório
-│   ├── requirements.txt              # Dependências da versão vulnerável
-│   ├── templates/login.html          # Interface do login
-│   ├── static/style.css              # Efeitos visuais da interface
-│   └── tests/test_app.py             # Cinco testes da linha de base
-├── hardened/                         # Esqueleto para a futura versão defensiva
-│   ├── README.md                     # Estado real e critérios planejados
-│   ├── requirements.txt              # Dependências iniciais, ainda mínimas
-│   ├── templates/login.html          # Base visual para preservar consistência
-│   └── static/style.css              # Mesma direção visual da versão vulnerável
+├── README.md
+├── .gitignore
+├── vulnerable/                       # Linha de base Flask intencionalmente vulnerável
+│   ├── README.md
+│   ├── app.py
+│   ├── requirements.txt
+│   ├── templates/login.html
+│   ├── static/style.css
+│   └── tests/test_app.py
+├── hardened/                         # Aplicação local com controles defensivos
+│   ├── README.md
+│   ├── .env.example                  # Apenas placeholders, sem segredos reais
+│   ├── .gitignore
+│   ├── requirements.txt
+│   ├── run.py
+│   ├── setup_lab.py
+│   ├── benchmark_hash.py
+│   ├── app/
+│   │   ├── routes/auth.py
+│   │   ├── security/passwords.py
+│   │   ├── security/rate_limit.py
+│   │   ├── static/css/
+│   │   └── templates/
+│   └── tests/
 ├── docs/
-│   ├── assets/banner.svg             # Banner local do README
-│   ├── diario-do-laboratorio.md      # Histórico da atividade web
-│   ├── guia-de-reproducao.md         # Procedimento de laboratório atualizado
-│   └── seguranca-e-limitacoes.md     # Limitações e controles recomendados
-├── images/                           # Evidências reais dos exercícios
+│   ├── assets/banner.jpg
+│   ├── diario-do-laboratorio.md
+│   ├── guia-de-reproducao.md
+│   └── seguranca-e-limitacoes.md
+├── images/
 │   ├── desenvolvimento/
 │   ├── web/
 │   ├── ftp/
 │   └── smb/
-└── wordlists/                        # Listas curtas didáticas versionadas
+└── wordlists/                        # Listas curtas para fins didáticos
 ```
-
-`hardened/` é um ponto de partida visual, não uma aplicação pronta. Não a execute nem a descreva como protegida até que o backend e os testes defensivos sejam implementados.
-
-## Testes
-
-Na pasta do projeto, com o ambiente virtual disponível, execute:
-
-```bat
-venv\Scripts\python.exe -m pytest -q
-```
-
-A suíte existente contém cinco testes para carregamento da página, credenciais válidas, senha inválida, usuário inválido e campos ausentes. Após qualquer alteração em HTML, CSS ou Python, execute os testes novamente no ambiente local. Uma execução anterior passou nos cinco testes, mas esse resultado não substitui a verificação do estado atual do repositório.
 
 ## Segurança e limitações
 
-A aplicação Flask é intencionalmente vulnerável e serve apenas como alvo de estudo. Ela não deve ser usada em produção. Na versão original documentada:
+- `vulnerable/` é deliberadamente frágil e serve somente como alvo de estudo isolado.
+- `hardened/` é um laboratório didático, não uma aplicação auditada, certificada ou pronta para produção.
+- O rate limiter fica em memória, é por IP, perde estado ao reiniciar e não coordena múltiplos processos/workers. Usuários atrás do mesmo IP compartilham o limite; origens diferentes não compartilham o contador.
+- A sessão é assinada no cookie do Flask, sem armazenamento de sessão no servidor; um cookie roubado não pode ser revogado individualmente antes de expirar. A expiração curta reduz, mas não elimina, esse risco.
+- O servidor local usa HTTP; o cookie `Secure` está desativado nesse modo. HTTPS real é necessário para ativá-lo em uma implantação protegida.
+- Não há MFA, persistência de contas, recuperação de senha, monitoramento centralizado ou proteção distribuída contra abuso.
+- Headers, CSRF, hash Argon2id e testes são camadas de defesa; sua presença não prova ausência de vulnerabilidades.
+- Nunca versione `.env`, credenciais reais, cookies, tokens, logs brutos ou listas temporárias. Revogue/rotacione qualquer segredo real exposto e avalie o histórico Git.
+- Não há autorização para testar serviços de terceiros. Timeout, conexão recusada ou banner de versão não provam, sozinhos, bloqueio ou vulnerabilidade específica.
 
-- A credencial demonstrativa está definida em código e não deve ser reutilizada em nenhum serviço real.
-- Não há limitação de tentativas, bloqueio temporário ou atraso progressivo.
-- Não há banco de dados nem autenticação baseada em sessão de produção.
-- Não há MFA; a aplicação não implementa CSRF, HTTPS/TLS ou cabeçalhos de segurança de produção.
-- HTTP `200` é usado tanto no caminho de sucesso como no de falha para facilitar a leitura do resultado no exercício web. Isso é uma decisão didática, não uma recomendação de contrato HTTP real.
-- O log local não deve conter a senha submetida; revise os logs antes de compartilhá-los e mantenha-os fora do Git.
-- Os resultados FTP/SMB se limitam aos serviços e às credenciais testados. Não implicam controle do sistema operacional.
-
-Para aplicações reais, considere hashing de senhas com uma biblioteca apropriada (por exemplo, Argon2id, scrypt ou bcrypt), rate limiting com recuperação segura, MFA quando aplicável, sessões e cookies seguros, proteção CSRF, HTTPS, logs sem segredos, tratamento de erros e testes de regressão.
-
-> [!WARNING]
-> A identificação `vsftpd 2.3.4` merece cautela: a [CVE-2011-2523](https://nvd.nist.gov/vuln/detail/CVE-2011-2523) descreve uma backdoor em um pacote distribuído em uma janela específica (downloads entre 30/06 e 03/07/2011). O banner identificado pelo Nmap, isoladamente, não comprova que o binário do alvo contém essa backdoor. Essa questão é distinta do exercício de brute force. O escopo deste trabalho é observar autenticação nos serviços de laboratório; não é necessário investigar nem explorar a backdoor para concluir as atividades documentadas.
-
-## Roadmap
-
-- [x] Preservar a implementação Flask vulnerável e registrar sua linha de base de cinco testes.
-- [x] Documentar a adaptação do cenário web porque o DVWA não pôde ser executado neste ambiente.
-- [x] Registrar evidências dos exercícios web, FTP e SMB, incluindo a validação SMB com `smbclient`.
-- [x] Melhorar a apresentação visual do formulário vulnerável sem alterar a rota nem os nomes dos campos utilizados no exercício.
-- [x] Preparar regras do `.gitignore` para listas temporárias de laboratório.
-- [ ] Revisar e alinhar os guias complementares com o código e o ambiente documentado.
-- [ ] Implementar a aplicação `hardened` em diretório separado, sem alterar a linha de base vulnerável.
-- [ ] Criar testes para limitação e recuperação de tentativas, logs sem segredos, sessão e demais controles adotados.
-- [ ] Comparar as versões vulnerável e reforçada com evidências reproduzíveis.
-- [ ] Revisar dependências, segredos, capturas e diff antes da publicação final.
+Referências principais: [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html) · [OWASP Web Security Testing Guide](https://owasp.org/www-project-web-security-testing-guide/) · [NIST SSDF](https://csrc.nist.gov/pubs/sp/800/218/final).
 
 ## Documentação complementar
 
-- [Diário do laboratório](docs/diario-do-laboratorio.md) — problemas encontrados, hipóteses e correções durante o exercício Flask.
-- [Guia de reprodução](docs/guia-de-reproducao.md) — etapas históricas de configuração e teste web; confira os comandos antes de executá-los, pois algumas anotações antigas podem não corresponder ao código atual.
-- [Segurança e limitações](docs/seguranca-e-limitacoes.md) — fraquezas intencionais, riscos e controles recomendados.
+- [`vulnerable/README.md`](vulnerable/README.md) — execução e limitações da linha de base vulnerável.
+- [`hardened/README.md`](hardened/README.md) — configuração, execução, rate limit, hashing e limitações da versão reforçada.
+- [`docs/diario-do-laboratorio.md`](docs/diario-do-laboratorio.md) — histórico do desenvolvimento e do exercício web.
+- [`docs/guia-de-reproducao.md`](docs/guia-de-reproducao.md) — passos históricos para reproduzir o laboratório.
+- [`docs/seguranca-e-limitacoes.md`](docs/seguranca-e-limitacoes.md) — riscos, controles e limites documentados.
 
-## Contribuição e licença
+## Roadmap
 
-Este projeto é uma atividade acadêmica em evolução. Sugestões podem ser registradas por meio de issues, desde que não incluam credenciais reais, tokens, cookies, dados pessoais ou logs brutos desnecessários.
+- [x] Preservar a linha de base vulnerável e seus testes.
+- [x] Documentar a adaptação do cenário web para Flask autoral.
+- [x] Registrar evidências dos exercícios web, FTP e SMB.
+- [x] Implementar a versão `hardened` separada, com Argon2id, CSRF, sessão, headers e rate limiting.
+- [x] Criar testes automatizados para os principais controles implementados.
+- [x] Atualizar a interface `hardened` para o tema tech/gamer neon com cadeado.
+- [ ] Reunir uma comparação final vulnerável vs. hardened com retestes padronizados e risco residual.
+- [ ] Rever e alinhar todos os guias complementares com o estado final do código.
+- [ ] Adicionar CI e auditoria de dependências/segredos quando apropriado.
 
-**Licença:** não há um arquivo `LICENSE` identificado na estrutura atual do repositório. Até que uma licença seja adicionada, não presuma que a publicação do código concede autorização geral para reutilização ou redistribuição.
+## Licença e autor
 
-## Autor
+Este projeto é uma atividade acadêmica independente. Não foi identificado um arquivo `LICENSE` no repositório; até que uma licença seja adicionada, não presuma que a publicação concede autorização geral de reutilização ou redistribuição.
 
 **Gabriel Almeida** — [@GabrielJalmeida no GitHub](https://github.com/GabrielJalmeida)
 
-Este laboratório foi desenvolvido para fins educacionais, com escopo controlado e registro explícito do que foi observado, do que foi adaptado e do que permanece planejado.
+Desenvolvido para fins educacionais, com foco em escopo autorizado, evidências reproduzíveis e descrição honesta do que foi implementado e testado.
