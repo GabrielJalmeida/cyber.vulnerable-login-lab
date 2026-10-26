@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Login — Cyber Lab{% endblock %}
+{% block content %}
+<section class="login-screen" aria-labelledby="page-heading">
+  <div class="login-heading">
+    <p class="eyebrow"><span class="eyebrow-pip" aria-hidden="true"></span> CYBER LAB <span class="slash">//</span> AUTH MODULE</p>
+    <h1 id="page-heading">ACESSO <span>RESTRITO</span></h1>
+    <p class="heading-subtitle">Seu acesso. Seu controle.</p>
+  </div>
+
+  <section class="lock-unit" aria-labelledby="login-title">
+    <div class="lock-shackle" aria-hidden="true"><span></span></div>
+    <div class="lock-body">
+      <div class="lock-core" aria-hidden="true">
+        <svg viewBox="0 0 64 64" fill="none">
+          <path d="M18 28V19a14 14 0 0 1 28 0v9" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+          <rect x="11" y="27" width="42" height="31" rx="8" stroke="currentColor" stroke-width="3.5"/>
+          <circle cx="32" cy="41" r="4" fill="currentColor"/>
+          <path d="M32 45v5" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2 id="login-title">LOGIN</h2>
+      <p class="lock-subtitle"><span></span> SECURE ACCESS <span></span></p>
+
+      {% if message %}
+        <div class="message message--{{ message_type|default('info') }}" role="{% if message_type == 'error' or message_type == 'warning' %}alert{% else %}status{% endif %}" aria-live="polite">
+          <span class="message-symbol" aria-hidden="true">{% if message_type == 'error' %}×{% elif message_type == 'warning' %}!{% else %}i{% endif %}</span>
+          <p>{{ message }}</p>
+        </div>
+      {% endif %}
+
+      <form action="{{ url_for('auth.login_submit') }}" method="post" class="login-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="field-group">
+          <label class="sr-only" for="username">Usuário de demonstração</label>
+          <span class="field-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 20c.5-3.5 3.2-5.5 7.5-5.5s7 2 7.5 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </span>
+          <input type="text" id="username" name="username" placeholder="Usuário" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="128" required>
+        </div>
+        <div class="field-group">
+          <label class="sr-only" for="password">Senha de demonstração</label>
+          <span class="field-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="10" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="15" r="1.3" fill="currentColor"/></svg>
+          </span>
+          <input type="password" id="password" name="password" placeholder="Senha" autocomplete="current-password" maxlength="1024" required>
+        </div>
+        <button class="primary-button" type="submit">
+          <span>ENTRAR</span>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </form>
+
+      <div class="lock-status"><span class="status-dot" aria-hidden="true"></span> CONEXÃO SEGURA <span class="status-line" aria-hidden="true"></span></div>
+    </div>
+  </section>
+
+  <div class="security-tags" aria-label="Controles demonstrados">
+    <span><b aria-hidden="true">✦</b> ARGON2ID</span>
+    <span><b aria-hidden="true">◈</b> RATE LIMIT</span>
+    <span><b aria-hidden="true">⌁</b> CSRF</span>
+  </div>
+
+  <p class="independence-notice"><span class="notice-mark" aria-hidden="true">ⓘ</span><span>Projeto independente. <strong>Não é um sistema oficial</strong> da DIO.</span></p>
+</section>
+{% endblock %}

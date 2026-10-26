@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Sessão ativa — Cyber Lab{% endblock %}
+{% block content %}
+<section class="result-panel" aria-labelledby="success-title">
+  <div class="result-icon result-icon--success" aria-hidden="true">
+    <svg viewBox="0 0 48 48" fill="none"><path d="m12 25 8 8 17-19" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <p class="eyebrow"><span class="eyebrow-pip" aria-hidden="true"></span> AUTH RESULT // 200</p>
+  <h1 id="success-title">SESSÃO <span>ATIVA</span></h1>
+  <p class="result-copy">Autenticação local confirmada.</p>
+  <div class="result-meta"><span>EXPIRA EM 15 MIN</span><span>·</span><span>LOCAL ONLY</span></div>
+  <form action="{{ url_for('auth.logout') }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="primary-button" type="submit"><span>ENCERRAR SESSÃO</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </form>
+</section>
+{% endblock %}

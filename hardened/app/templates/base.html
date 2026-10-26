@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070911">
+  <meta name="description" content="Cyber Lab — laboratório local de autenticação.">
+  <title>{% block title %}Cyber Lab — Acesso local{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+</head>
+<body>
+  <div class="ambient-grid" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="wordmark" href="{{ url_for('auth.login_page') }}" aria-label="Cyber Lab — início">
+      <span class="wordmark-symbol" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none"><path d="M16 2.8 27.5 8v8.2c0 6.4-4.8 10.6-11.5 13C9.3 26.8 4.5 22.6 4.5 16.2V8L16 2.8Z" stroke="currentColor" stroke-width="1.7"/><rect x="11.2" y="14" width="9.6" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M13.4 14v-2.2a2.6 2.6 0 0 1 5.2 0V14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </span>
+      <span class="wordmark-text">CYBER<span>LAB</span></span>
+    </a>
+    <div class="topbar-status"><span class="status-dot" aria-hidden="true"></span><span>LOCAL SYSTEM</span></div>
+  </header>
+
+  <main id="main-content" class="page-shell">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <span>CYBER LAB <i aria-hidden="true">/</i> AUTH MODULE 01</span>
+    <span>AMBIENTE LOCAL · SEM SERVIÇOS EXTERNOS</span>
+  </footer>
+</body>
+</html>
