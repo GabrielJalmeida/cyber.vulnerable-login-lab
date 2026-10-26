@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} — Cyber Lab{% endblock %}
+{% block content %}
+<section class="result-panel error-panel" aria-labelledby="error-title">
+  <div class="result-icon result-icon--error" aria-hidden="true">!</div>
+  <p class="eyebrow"><span class="eyebrow-pip" aria-hidden="true"></span> SYSTEM RESPONSE</p>
+  <h1 id="error-title">{{ title }}</h1>
+  <p class="result-copy">{{ message }}</p>
+  <a class="primary-button text-link" href="{{ url_for('auth.login_page') }}"><span>VOLTAR AO LOGIN</span><span aria-hidden="true">↗</span></a>
+</section>
+{% endblock %}
